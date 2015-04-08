@@ -1,0 +1,13 @@
+redis:
+  image: redis
+  ports:
+    - "6379:6379"
+
+service:
+  build: ci-service
+  volumes:
+    - ci-service:/api
+  links:
+    - redis
+  ports:
+    - "80:5000"
