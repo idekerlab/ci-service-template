@@ -15,6 +15,10 @@ class StatisticsService(restful.Resource):
         self.__parser = reqparse.RequestParser()
 
     def post(self):
+        """
+        Create and submit a new graph analysis job in the queue.
+        :return:
+        """
         self.__parser.add_argument('elements', type=dict, help='Elements')
         self.__parser.add_argument('data', type=dict, help='Network Attr')
         graph = self.__parser.parse_args()
