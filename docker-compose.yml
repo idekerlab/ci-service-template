@@ -5,8 +5,6 @@ redis:
 
 service:
   build: ci-service
-  volumes:
-    - ci-service:/api
   links:
     - redis
   ports:

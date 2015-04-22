@@ -7,6 +7,8 @@ This will be used to check whether the service is actually working or not.
 
 from flask.ext import restful
 from flask.ext.restful import reqparse
+from flask import request
+from flask import jsonify
 
 
 class Version(restful.Resource):
@@ -20,7 +22,8 @@ class Version(restful.Resource):
     def get(self):
         version = {
             'serviceName': 'Cytoscape CI template service',
-            'version': '0.1.0'
+            'version': '0.1.0',
+            'message': 'Called from: ' + str(request.remote_addr)
         }
 
         return version, 200
