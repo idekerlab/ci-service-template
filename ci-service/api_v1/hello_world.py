@@ -5,8 +5,14 @@ import time
 
 class HelloService(restful.Resource):
     """
-    Toy example to learn how to implement yo
+    Toy example to learn how to implement simple service
     """
+
+    def get(self):
+        description = {
+            'message': 'Greet service.  Use POST to test queue.'
+        }
+        return description, 200
 
     def post(self):
         # Send the time-consuming job to workers
