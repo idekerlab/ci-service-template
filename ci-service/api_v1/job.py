@@ -11,9 +11,12 @@ import rq.exceptions
 from rq.job import JobStatus
 
 
+from flask import Response
+
 class SingleJob(restful.Resource):
 
     def get(self, job_id):
+
         try:
             job = Job.fetch(job_id, connection=redis_conn)
         except rq.exceptions.NoSuchJobError:
