@@ -12,6 +12,9 @@ from flask import request
 # For logging
 from . import logger
 
+import requests
+
+VERSION = '0.2.0'
 
 class Version(restful.Resource):
     """
@@ -27,8 +30,9 @@ class Version(restful.Resource):
 
         version = {
             'serviceName': 'Cytoscape CI template service',
-            'version': '0.1.1',
+            'version': VERSION,
             'message': 'Called from: ' + str(request.remote_addr)
         }
+
 
         return version, 200

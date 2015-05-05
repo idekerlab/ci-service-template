@@ -5,7 +5,8 @@ from py2cytoscape import util
 from flask.ext.restful import reqparse
 from jobs import q, job_list
 
-from . import app
+from . import logger
+import requests
 
 import uuid
 import os
@@ -59,6 +60,9 @@ class ScaleFree(GraphGeneratorService):
         cyjs = util.from_networkx(graph)
 
         filename = os.path.join(self.APP_ROOT, 'results/' + str(file_id.int))
+
+        #res = requests.get('http://test.ndexbio.org/rest/network/1e413325-cda3-11e4-828b-000c29873918/asNetwork')
+        #logger.debug(res.json())
 
         tempfile = open(filename, 'w')
         json.dump(cyjs, tempfile)
