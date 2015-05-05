@@ -1,5 +1,6 @@
 from flask import Flask
 from flask.ext import restful
+from api_v1 import app
 
 from api_v1.graph_analysis import *
 from api_v1.version import *
@@ -11,7 +12,6 @@ from api_v1.file_streaming import *
 
 from api_v1.graph_generator import *
 
-app = Flask(__name__)
 api = restful.Api(app)
 
 # Top-level URL - simply returns service name

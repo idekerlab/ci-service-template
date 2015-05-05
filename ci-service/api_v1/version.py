@@ -8,7 +8,9 @@ This will be used to check whether the service is actually working or not.
 from flask.ext import restful
 from flask.ext.restful import reqparse
 from flask import request
-from flask import jsonify
+
+# For logging
+from . import logger
 
 
 class Version(restful.Resource):
@@ -20,6 +22,9 @@ class Version(restful.Resource):
         self.__parser = reqparse.RequestParser()
 
     def get(self):
+
+        logger.info('Version API called')
+
         version = {
             'serviceName': 'Cytoscape CI template service',
             'version': '0.1.1',

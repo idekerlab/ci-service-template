@@ -5,6 +5,8 @@ from py2cytoscape import util
 from flask.ext.restful import reqparse
 from jobs import q, job_list
 
+from . import app
+
 import uuid
 import os
 import json
@@ -58,7 +60,6 @@ class ScaleFree(GraphGeneratorService):
 
         filename = os.path.join(self.APP_ROOT, 'results/' + str(file_id.int))
 
-        print(str(filename))
         tempfile = open(filename, 'w')
         json.dump(cyjs, tempfile)
         tempfile.close()
