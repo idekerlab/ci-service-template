@@ -22,7 +22,7 @@ class Version(restful.Resource):
     def get(self):
         version = {
             'serviceName': 'Cytoscape CI template service',
-            'version': '0.1.0',
+            'version': '0.1.1',
             'message': 'Called from: ' + str(request.remote_addr)
         }
 

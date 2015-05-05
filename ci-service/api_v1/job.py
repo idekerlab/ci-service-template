@@ -10,10 +10,26 @@ from jobs import redis_conn, q, job_list
 import rq.exceptions
 from rq.job import JobStatus
 
+from tags import *
+import os
+
 
 from flask import Response
 
 class SingleJob(restful.Resource):
+
+    def __init__(self):
+        self.APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
+
+    def __stream_file(self, file_id):
+
+        def generate(result_file_name):
+            filename = os.path.join(self.APP_ROOT, 'results/' + result_file_name)
+            f = open(filename)
+            for line in f:
+                yield line
+
+        return Response(generate(file_id))
 
     def get(self, job_id):
 
@@ -26,7 +42,14 @@ class SingleJob(restful.Resource):
             return not_found, 404
 
         if job.is_finished:
-            return job.result, 200
+            result_type = job.meta[RESULT_TYPE]
+            if result_type == RESULT_FILE:
+                # Result contains file location (as UUID)
+                result_file = job.result['file']
+                return self.__stream_file(result_file)
+            else:
+                # Simply return result directly from
+                return job.result, 200
         else:
             # Return status if not available.
             status = {

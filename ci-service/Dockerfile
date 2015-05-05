@@ -8,7 +8,7 @@ RUN pip install Flask flask-restful py2cytoscape pygraphviz python-igraph redis 
 
 RUN mkdir /api
 WORKDIR /api
-ADD . /api
+#ADD . /api
 
 EXPOSE 5000
 

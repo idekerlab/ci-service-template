@@ -9,6 +9,8 @@ from api_v1.hello_world import *
 
 from api_v1.file_streaming import *
 
+from api_v1.graph_generator import *
+
 app = Flask(__name__)
 api = restful.Api(app)
 
@@ -24,6 +26,9 @@ api.add_resource(StreamingService, '/v1/jobs/<job_id>/result')
 api.add_resource(Betweenness, '/v1/algorithms/betweenness')
 api.add_resource(PageRank, '/v1/algorithms/pagerank')
 api.add_resource(Clustering, '/v1/algorithms/clustering')
+
+#
+api.add_resource(ScaleFree, '/v1/generators/scalefree')
 
 # Task Queue
 api.add_resource(Jobs, '/v1/jobs')

@@ -27,13 +27,19 @@ class StatisticsService(restful.Resource):
         job = q.enqueue_call(func=self.calculate, args=(graph, {}), result_ttl=RESULT_TIME_TO_LIVE)
         job_list.append(job.get_id())
 
-        result = {
+        # Set optional parameter.  Result will be saved to file
+        job.meta['result_type'] = 'file'
+        job.save()
+
+        job_info = {
             'job_id': job.get_id(),
             'status': job.get_status(),
-            'url': 'http://192.168.59.103/v1/jobs/' + job.get_id()
+            'url': '/v1/jobs/' + job.get_id(),
+            'result_type': job.meta['result_type']
         }
 
-        return result, 202
+        # Job created.
+        return job_info, 202
 
     def calculate(self, graph, params):
         pass
