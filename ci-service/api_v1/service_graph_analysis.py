@@ -19,6 +19,8 @@ class StatisticsService(restful.Resource):
         Create and submit a new graph analysis job in the queue.
         :return:
         """
+
+        # Extract data from body of POST call
         self.__parser.add_argument('elements', type=dict, help='Elements')
         self.__parser.add_argument('data', type=dict, help='Network Attr')
         graph = self.__parser.parse_args()

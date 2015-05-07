@@ -13,18 +13,21 @@ from rq.job import JobStatus
 from tags import *
 import os
 
-
 from flask import Response
+
+from . import logger
+from .utils.file_writer import FileUtil
+
 
 class SingleJob(restful.Resource):
 
     def __init__(self):
-        self.APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
+        self.file_util = FileUtil()
 
     def __stream_file(self, file_id):
 
         def generate(result_file_name):
-            filename = os.path.join(self.APP_ROOT, 'results/' + result_file_name)
+            filename = self.file_util.get_result_file_location(result_file_name)
             f = open(filename)
             for line in f:
                 yield line
@@ -64,6 +67,8 @@ class SingleJob(restful.Resource):
 
         :return:
         """
+
+        # Check task exists or not.
         try:
             job = Job.fetch(job_id, connection=redis_conn)
         except rq.exceptions.NoSuchJobError:
@@ -76,7 +81,15 @@ class SingleJob(restful.Resource):
         if status is JobStatus.STARTED:
             job.cancel()
 
+        # Extra cleanup required: Remove temp file if necessary
+        result_type = job.meta[RESULT_TYPE]
+        if result_type == RESULT_FILE:
+            file_id = job.result['file']
+            filename = self.file_util.get_result_file_location(file_id)
+            logger.debug('deleting: ' + str(filename))
+            os.remove(filename)
+
+        job_list.remove(job.get_id())
         q.remove(job)
-        job_list.remove(job)
 
         return {'message': 'Job ' + job_id + ' removed.'}, 200

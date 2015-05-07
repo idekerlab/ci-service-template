@@ -1,38 +1,30 @@
-from flask import Flask
-from flask.ext import restful
-from api_v1 import app
+from api_v1 import api, app
 
-from api_v1.graph_analysis import *
-from api_v1.version import *
+from api_v1.service_version import Version
 from api_v1.jobs import *
 from api_v1.job import *
-from api_v1.hello_world import *
 
-from api_v1.file_streaming import *
-
-from api_v1.graph_generator import *
-
-api = restful.Api(app)
+from api_v1.service_hello import *
+from api_v1.service_graph_analysis import *
+from api_v1.service_graph_generator import *
 
 # Top-level URL - simply returns service name
-api.add_resource(Version, '/v1')
+api.add_resource(Version, '')
 
 # Toy example to return greeting message.
-api.add_resource(HelloService, '/v1/hello')
-
-api.add_resource(StreamingService, '/v1/jobs/<job_id>/result')
+api.add_resource(HelloService, '/hello')
 
 # Sample services: Calculate graph statistics
-api.add_resource(Betweenness, '/v1/algorithms/betweenness')
-api.add_resource(PageRank, '/v1/algorithms/pagerank')
-api.add_resource(Clustering, '/v1/algorithms/clustering')
+api.add_resource(Betweenness, '/algorithms/betweenness')
+api.add_resource(PageRank, '/algorithms/pagerank')
+api.add_resource(Clustering, '/algorithms/clustering')
 
-#
-api.add_resource(ScaleFree, '/v1/generators/scalefree')
+# Sample services: Using temp files for results
+api.add_resource(ScaleFree, '/generators/scalefree')
 
 # Task Queue
-api.add_resource(Jobs, '/v1/jobs')
-api.add_resource(SingleJob, '/v1/jobs/<job_id>')
+api.add_resource(Jobs, '/jobs')
+api.add_resource(SingleJob, '/jobs/<job_id>')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=5000)

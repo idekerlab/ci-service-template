@@ -56,5 +56,5 @@ target/
 .idea
 .idea/vagrant.xml
 
-ci-service/api_v1/results/*
+*results
 *.ipynb_checkpoints

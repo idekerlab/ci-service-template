@@ -10,6 +10,12 @@ from rq.job import Job
 from rq.job import JobStatus
 from redis import Redis
 
+import tags
+import os
+
+from .utils.file_writer import FileUtil
+from . import logger
+
 redis_conn = Redis('redis', 6379)
 q = Queue(connection=redis_conn)
 
@@ -18,6 +24,9 @@ job_list = []
 
 
 class Jobs(restful.Resource):
+
+    def __init__(self):
+        self.file_util = FileUtil()
 
     """
     API for job management.
@@ -50,6 +59,14 @@ class Jobs(restful.Resource):
             status = job.get_status()
             if status is JobStatus.STARTED:
                 job.cancel()
+
+            # Remove temp files if necessary
+            result_type = job.meta[tags.RESULT_TYPE]
+            if result_type == tags.RESULT_FILE:
+                file_id = job.result['file']
+                filename = self.file_util.get_result_file_location(file_id)
+                logger.debug('deleting: ' + str(filename))
+                os.remove(filename)
 
         q.empty()
         del job_list[:]

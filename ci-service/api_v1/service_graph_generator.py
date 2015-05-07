@@ -5,20 +5,32 @@ from py2cytoscape import util
 from flask.ext.restful import reqparse
 from jobs import q, job_list
 
-from . import logger
+from . import logger, API_VERSION
 import requests
+
+from .utils.file_writer import FileUtil
 
 import uuid
 import os
 import json
 
-# Lifetime of the results.
+import tags
+
+# Lifetime of the results
 RESULT_TIME_TO_LIVE = 500000
 
+# Timeout for this task is 1 week
+TIMEOUT = 60*60*24*7
+
+
 class GraphGeneratorService(restful.Resource):
+    """
+    Sample service to use temp file for storing result.
+    """
 
     def __init__(self):
-        self.APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
+        # self.APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
+        self.file_util = FileUtil()
         self.__parser = reqparse.RequestParser()
 
     def post(self):
@@ -30,7 +42,10 @@ class GraphGeneratorService(restful.Resource):
         graph_info = self.__parser.parse_args()
 
         # Send the time-consuming job to workers
-        job = q.enqueue_call(func=self.generate, args=(graph_info,), result_ttl=RESULT_TIME_TO_LIVE)
+        job = q.enqueue_call(
+            func=self.generate,
+            args=(graph_info,),
+            timeout=RESULT_TIME_TO_LIVE, result_ttl=RESULT_TIME_TO_LIVE)
         job_list.append(job.get_id())
 
         # Set optional parameter.  Result will be saved to file
@@ -40,7 +55,7 @@ class GraphGeneratorService(restful.Resource):
         job_info = {
             'job_id': job.get_id(),
             'status': job.get_status(),
-            'url': '/v1/jobs/' + job.get_id(),
+            'url': API_VERSION + 'jobs/' + job.get_id(),
             'result_type': job.meta['result_type']
         }
 
@@ -50,26 +65,26 @@ class GraphGeneratorService(restful.Resource):
     def generate(self, params):
         pass
 
+    # def create_result(self, file_id, graph):
+    #     filename = os.path.join(self.APP_ROOT, tags.RESULT_DIRECTORY + '/' + str(file_id.int))
+    #
+    #     temp_file = open(filename, 'w')
+    #     json.dump(graph, temp_file)
+    #     temp_file.close()
+    #
+    #     result = {
+    #         'file': str(file_id.int)
+    #     }
+    #
+    #     return result
+
 
 class ScaleFree(GraphGeneratorService):
+    """
+    Random graph generator using NetworkX's Scale-Free graph generator.
+    """
 
     def generate(self, params):
-        file_id = uuid.uuid1()
-
         graph = nx.scale_free_graph(params['num_nodes'])
         cyjs = util.from_networkx(graph)
-
-        filename = os.path.join(self.APP_ROOT, 'results/' + str(file_id.int))
-
-        #res = requests.get('http://test.ndexbio.org/rest/network/1e413325-cda3-11e4-828b-000c29873918/asNetwork')
-        #logger.debug(res.json())
-
-        tempfile = open(filename, 'w')
-        json.dump(cyjs, tempfile)
-        tempfile.close()
-
-        result = {
-            'file': str(file_id.int)
-        }
-
-        return result
+        return self.file_util.create_result(uuid.uuid1().int, cyjs)
