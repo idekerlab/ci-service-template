@@ -65,19 +65,6 @@ class GraphGeneratorService(restful.Resource):
     def generate(self, params):
         pass
 
-    # def create_result(self, file_id, graph):
-    #     filename = os.path.join(self.APP_ROOT, tags.RESULT_DIRECTORY + '/' + str(file_id.int))
-    #
-    #     temp_file = open(filename, 'w')
-    #     json.dump(graph, temp_file)
-    #     temp_file.close()
-    #
-    #     result = {
-    #         'file': str(file_id.int)
-    #     }
-    #
-    #     return result
-
 
 class ScaleFree(GraphGeneratorService):
     """
