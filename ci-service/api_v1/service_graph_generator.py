@@ -1,26 +1,23 @@
-from flask.ext import restful
+import uuid
 
+from flask.ext import restful
 from networkx import nx
 from py2cytoscape import util
 from flask.ext.restful import reqparse
+
 from jobs import q, job_list
-
-from . import logger, API_VERSION
-import requests
-
+from . import API_VERSION
+from .utils.logger_factory import LoggerUtil
 from .utils.file_writer import FileUtil
-
-import uuid
-import os
-import json
-
-import tags
 
 # Lifetime of the results
 RESULT_TIME_TO_LIVE = 500000
 
 # Timeout for this task is 1 week
 TIMEOUT = 60*60*24*7
+
+# Logger for queued tasks
+task_logger = LoggerUtil.get_logger(__name__)
 
 
 class GraphGeneratorService(restful.Resource):
@@ -29,7 +26,6 @@ class GraphGeneratorService(restful.Resource):
     """
 
     def __init__(self):
-        # self.APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
         self.file_util = FileUtil()
         self.__parser = reqparse.RequestParser()
 
@@ -72,6 +68,12 @@ class ScaleFree(GraphGeneratorService):
     """
 
     def generate(self, params):
+
+        task_logger.debug('Generate job started')
+
         graph = nx.scale_free_graph(params['num_nodes'])
         cyjs = util.from_networkx(graph)
+
+        task_logger.debug('Generate job finished')
+
         return self.file_util.create_result(uuid.uuid1().int, cyjs)
