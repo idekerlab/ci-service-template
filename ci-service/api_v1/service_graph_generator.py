@@ -1,79 +1,31 @@
 import uuid
 
-from flask.ext import restful
+import base_service
 from networkx import nx
 from py2cytoscape import util
-from flask.ext.restful import reqparse
 
-from jobs import q, job_list
-from . import API_VERSION
-from .utils.logger_factory import LoggerUtil
-from .utils.file_writer import FileUtil
+from . import task_logger
 
-# Lifetime of the results
-RESULT_TIME_TO_LIVE = 500000
-
-# Timeout for this task is 1 week
-TIMEOUT = 60*60*24*7
+from .utils.file_util import FileUtil
 
 # Logger for queued tasks
-task_logger = LoggerUtil.get_logger(__name__)
+# task_logger = LoggerUtil.get_logger(__name__)
 
 
-class GraphGeneratorService(restful.Resource):
-    """
-    Sample service to use temp file for storing result.
-    """
-
-    def __init__(self):
-        self.file_util = FileUtil()
-        self.__parser = reqparse.RequestParser()
-
-    def post(self):
-        """
-        Create and submit a new graph analysis job in the queue.
-        :return:
-        """
-        self.__parser.add_argument('num_nodes', type=int, help='Number of Nodes')
-        graph_info = self.__parser.parse_args()
-
-        # Send the time-consuming job to workers
-        job = q.enqueue_call(
-            func=self.generate,
-            args=(graph_info,),
-            timeout=RESULT_TIME_TO_LIVE, result_ttl=RESULT_TIME_TO_LIVE)
-        job_list.append(job.get_id())
-
-        # Set optional parameter.  Result will be saved to file
-        job.meta['result_type'] = 'file'
-        job.save()
-
-        job_info = {
-            'job_id': job.get_id(),
-            'status': job.get_status(),
-            'url': API_VERSION + 'jobs/' + job.get_id(),
-            'result_type': job.meta['result_type']
-        }
-
-        # Job created.
-        return job_info, 202
-
-    def generate(self, params):
-        pass
-
-
-class ScaleFree(GraphGeneratorService):
+class GraphGeneratorService(base_service.BaseService):
     """
     Random graph generator using NetworkX's Scale-Free graph generator.
     """
 
-    def generate(self, params):
+    def parse_args(self):
+        self.parser.add_argument('num_nodes', type=int, help='Number of Nodes')
 
+    def run_service(self, data):
         task_logger.debug('Generate job started')
 
-        graph = nx.scale_free_graph(params['num_nodes'])
-        cyjs = util.from_networkx(graph)
+        graph = nx.scale_free_graph(data['num_nodes'])
+        result = util.from_networkx(graph)
 
         task_logger.debug('Generate job finished')
 
-        return self.file_util.create_result(uuid.uuid1().int, cyjs)
+        return FileUtil.create_result(uuid.uuid1().int, result)

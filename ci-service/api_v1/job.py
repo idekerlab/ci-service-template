@@ -4,30 +4,29 @@
 API to access a specific job.
 """
 
-from flask.ext import restful
-from rq.job import Job
-from jobs import redis_conn, q, job_list
-import rq.exceptions
-from rq.job import JobStatus
-
-from tags import *
 import os
 
+from flask.ext import restful
+from rq.job import Job
+import rq.exceptions
+from rq.job import JobStatus
 from flask import Response
 
+from jobs import redis_conn, q, job_list
 from . import logger
-from .utils.file_writer import FileUtil
+from utils.file_util import FileUtil
+
+RESULT_TYPE = 'result_type'
+RESULT_FILE = 'file'
 
 
 class SingleJob(restful.Resource):
 
-    def __init__(self):
-        self.file_util = FileUtil()
-
     def __stream_file(self, file_id):
 
         def generate(result_file_name):
-            filename = self.file_util.get_result_file_location(result_file_name)
+            filename = FileUtil.get_result_file_location(result_file_name)
+
             f = open(filename)
             for line in f:
                 yield line
@@ -48,7 +47,7 @@ class SingleJob(restful.Resource):
             result_type = job.meta[RESULT_TYPE]
             if result_type == RESULT_FILE:
                 # Result contains file location (as UUID)
-                result_file = job.result['file']
+                result_file = job.result[RESULT_FILE]
                 return self.__stream_file(result_file)
             else:
                 # Simply return result directly from
@@ -92,4 +91,8 @@ class SingleJob(restful.Resource):
         job_list.remove(job.get_id())
         q.remove(job)
 
-        return {'message': 'Job ' + job_id + ' removed.'}, 200
+        result = {
+            'message': 'Job ' + job_id + ' removed.'
+        }
+
+        return result, 200

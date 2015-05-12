@@ -16,6 +16,7 @@ api.add_resource(Version, '')
 # Toy example to return greeting message.
 api.add_resource(HelloService, '/hello')
 
+# Echo service.  Simply returned post body
 api.add_resource(EchoService, '/echo')
 
 # Sample services: Calculate graph statistics
@@ -24,7 +25,7 @@ api.add_resource(PageRank, '/algorithms/pagerank')
 api.add_resource(Clustering, '/algorithms/clustering')
 
 # Sample services: Using temp files for results
-api.add_resource(ScaleFree, '/generators/scalefree')
+api.add_resource(GraphGeneratorService, '/generators/scalefree')
 
 # Task Queue
 api.add_resource(Jobs, '/jobs')

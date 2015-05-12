@@ -7,7 +7,7 @@ RESULT_TIME_TO_LIVE = 500000
 
 class EchoService(restful.Resource):
     """
-    Echo server to return POST body
+    Echo server: returns POST body under "args"
     """
 
     def __init__(self):
