@@ -1,23 +1,15 @@
 # -*- coding: utf-8 -*-
-
-"""
-API to access a specific job.
-"""
-
 import os
 
 from flask.ext import restful
-from rq.job import Job
+from rq.job import Job, JobStatus
 import rq.exceptions
-from rq.job import JobStatus
 from flask import Response
 
 from jobs import redis_conn, q, job_list
-from . import logger
-from utils.file_util import FileUtil
+from . import logger, RESULT_TYPE, RESULT_FILE
 
-RESULT_TYPE = 'result_type'
-RESULT_FILE = 'file'
+from utils.file_util import FileUtil
 
 
 class SingleJob(restful.Resource):

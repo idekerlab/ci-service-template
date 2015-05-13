@@ -1,65 +1,34 @@
-from flask.ext import restful
-
 from networkx import nx
 from py2cytoscape import util
-from flask.ext.restful import reqparse
-from jobs import q, job_list
+from base_service import MemoryResultService
+from utils.logger_factory import LoggerUtil
 
-# Lifetime of the results.
-RESULT_TIME_TO_LIVE = 500000
+logger = LoggerUtil.get_logger(__name__)
 
 
-class StatisticsService(restful.Resource):
+class StatisticsService(MemoryResultService):
 
-    def __init__(self):
-        self.__parser = reqparse.RequestParser()
-
-    def post(self):
-        """
-        Create and submit a new graph analysis job in the queue.
-        :return:
-        """
-
-        # Extract data from body of POST call
-        self.__parser.add_argument('elements', type=dict, help='Elements')
-        self.__parser.add_argument('data', type=dict, help='Network Attr')
-        graph = self.__parser.parse_args()
-
-        # Send the time-consuming job to workers
-        job = q.enqueue_call(func=self.calculate, args=(graph, {}), result_ttl=RESULT_TIME_TO_LIVE)
-        job_list.append(job.get_id())
-
-        # Set optional parameter.  Result will be saved to file
-        job.meta['result_type'] = 'file'
-        job.save()
-
-        job_info = {
-            'job_id': job.get_id(),
-            'status': job.get_status(),
-            'url': '/v1/jobs/' + job.get_id(),
-            'result_type': job.meta['result_type']
-        }
-
-        # Job created.
-        return job_info, 202
-
-    def calculate(self, graph, params):
-        pass
+    def parse_args(self):
+        self.parser.add_argument('elements', type=dict, required=True, help='Elements')
+        self.parser.add_argument('data', type=dict, required=True, help='Network Attr')
 
 
 class Betweenness(StatisticsService):
-    def calculate(self, graph, params):
-        nx_graph = util.to_networkx(graph)
+    def run_service(self, data):
+        logger.debug('Calculating betweenness.')
+        nx_graph = util.to_networkx(data)
         return nx.betweenness_centrality(nx_graph)
 
 
 class PageRank(StatisticsService):
-    def calculate(self, graph, params):
-        nx_graph = util.to_networkx(graph)
+    def run_service(self, data):
+        logger.debug('Calculating PageRank.')
+        nx_graph = util.to_networkx(data)
         return nx.pagerank_scipy(nx_graph)
 
 
 class Clustering(StatisticsService):
-    def calculate(self, graph, params):
-        nx_graph = util.to_networkx(graph)
+    def run_service(self, data):
+        logger.debug('Calculating clustering coefficients.')
+        nx_graph = util.to_networkx(data)
         return nx.clustering(nx_graph)

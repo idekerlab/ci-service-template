@@ -7,11 +7,7 @@ This will be used to check whether the service is actually working or not.
 
 from flask.ext import restful
 from flask import request
-
-# For logging
-from . import logger
-
-VERSION = '0.2.0'
+from . import task_logger as logger
 
 
 class Version(restful.Resource):
@@ -21,11 +17,12 @@ class Version(restful.Resource):
 
     def get(self):
 
-        logger.debug('Version API GET method called.')
+        # This is standard logger in Flask
+        logger.debug('GET called for Version API')
 
         version = {
             'serviceName': 'Cytoscape CI template service',
-            'version': VERSION,
+            'version': '1',
             'message': 'Called by:  ' + str(request.remote_addr)
         }
 

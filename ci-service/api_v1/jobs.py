@@ -9,20 +9,16 @@ from rq import Queue
 from rq.job import Job
 from rq.job import JobStatus
 from redis import Redis
-
 import os
-
 from utils.file_util import FileUtil
-from . import logger
+from . import logger, RESULT_FILE, RESULT_TYPE
+
 
 redis_conn = Redis('redis', 6379)
 q = Queue(connection=redis_conn)
 
 # List of jobs
 job_list = []
-
-RESULT_TYPE = 'result_type'
-RESULT_FILE = 'file'
 
 
 class Jobs(restful.Resource):

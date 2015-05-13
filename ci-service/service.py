@@ -5,7 +5,6 @@ from api_v1.jobs import *
 from api_v1.job import *
 
 from api_v1.service_hello import *
-from api_v1.service_echo import *
 
 from api_v1.service_graph_analysis import *
 from api_v1.service_graph_generator import *
@@ -13,11 +12,8 @@ from api_v1.service_graph_generator import *
 # Top-level URL - simply returns service name
 api.add_resource(Version, '')
 
-# Toy example to return greeting message.
+# Toy example service: Return greeting message.
 api.add_resource(HelloService, '/hello')
-
-# Echo service.  Simply returned post body
-api.add_resource(EchoService, '/echo')
 
 # Sample services: Calculate graph statistics
 api.add_resource(Betweenness, '/algorithms/betweenness')
