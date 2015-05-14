@@ -1,6 +1,5 @@
 import uuid
-from networkx import nx
-from py2cytoscape import util
+from tasks.graph_factory import GraphFactory
 from base_service import FileResultService
 from .utils.file_util import FileUtil
 from utils.logger_factory import LoggerUtil
@@ -18,10 +17,7 @@ class GraphGeneratorService(FileResultService):
 
     def run_service(self, data):
         logger.debug('Generate job started')
-
-        graph = nx.scale_free_graph(data['num_nodes'])
-        result = util.from_networkx(graph)
-
+        result = GraphFactory.get_scale_free_graph(data['num_nodes'])
         logger.debug('Generate job finished')
 
         return FileUtil.create_result(uuid.uuid1().int, result)
