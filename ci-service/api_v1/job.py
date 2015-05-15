@@ -1,56 +1,68 @@
 # -*- coding: utf-8 -*-
+import os
+import logging
 
-"""
-API to access a specific job.
-"""
-
-from flask.ext import restful
-from rq.job import Job
-from jobs import redis_conn, q, job_list
+from flask.ext.restful import Resource
+from rq.job import Job, JobStatus
 import rq.exceptions
-from rq.job import JobStatus
+
+from jobs import redis_conn, q, job_list
+from . import RESULT_TYPE, RESULT_FILE
+from utils.file_util import FileUtil
+from utils.job_util import JobUtil
 
 
-class SingleJob(restful.Resource):
+class SingleJob(Resource):
+    """A Job resource
+    All queued jobs are represented as this resource
+    """
 
     def get(self, job_id):
+        """
+        Returns status of the job
+
+        :param job_id: Job ID in the queue
+        :return: Status of job as dict
+        """
+
         try:
             job = Job.fetch(job_id, connection=redis_conn)
         except rq.exceptions.NoSuchJobError:
-            not_found = {
-                'message': 'Job ' + job_id + ' does not exist.'
-            }
-            return not_found, 404
+            return JobUtil.get_not_found_message(job_id)
 
-        if job.is_finished:
-            return job.result, 200
-        else:
-            # Return status if not available.
-            status = {
-                'job_id': job_id,
-                'status': job.get_status()
-            }
-            return status, 200
+        # Return status of the job
+        return JobUtil.get_job_info(job), 200
 
     def delete(self, job_id):
         """
-        Delete a job from queue.
+        Delete a job from the queue
 
         :return:
         """
+
+        # Check task exists or not.
         try:
             job = Job.fetch(job_id, connection=redis_conn)
         except rq.exceptions.NoSuchJobError:
-            not_found = {
-                'message': 'Job ' + job_id + ' does not exist.'
-            }
-            return not_found, 404
+            return JobUtil.get_not_found_message(job_id)
 
         status = job.get_status()
         if status is JobStatus.STARTED:
             job.cancel()
 
-        q.remove(job)
-        job_list.remove(job)
+        # Extra cleanup required: Remove temp file if necessary
+        result_type = job.meta[RESULT_TYPE]
+        if result_type == RESULT_FILE:
+            file_id = job.result['file']
+            filename = FileUtil.get_result_file_location(file_id)
+            logging.debug('Deleting: ' + str(filename))
+            os.remove(filename)
 
-        return {'message': 'Job ' + job_id + ' removed.'}, 200
+        job_list.remove(job.get_id())
+        q.remove(job)
+
+        result = {
+            'message': 'Job ' + job_id + ' removed.'
+        }
+
+        return result, 200

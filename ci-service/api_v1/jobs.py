@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
+import os
+import logging
 
-"""API for all jobs in this system
-
-"""
-
-from flask.ext import restful
+from flask.ext.restful import Resource
 from rq import Queue
 from rq.job import Job
 from rq.job import JobStatus
 from redis import Redis
 
+from utils.file_util import FileUtil
+from . import RESULT_FILE, RESULT_TYPE
+
+# Connection to Redis Queue
 redis_conn = Redis('redis', 6379)
 q = Queue(connection=redis_conn)
 
-# List of jobs
+# List of jobs (Ordered)
 job_list = []
 
 
-class Jobs(restful.Resource):
-
+class Jobs(Resource):
     """
     API for job management.
     """
@@ -50,6 +51,14 @@ class Jobs(restful.Resource):
             status = job.get_status()
             if status is JobStatus.STARTED:
                 job.cancel()
+
+            # Remove temp files if necessary
+            result_type = job.meta[RESULT_TYPE]
+            if result_type == RESULT_FILE:
+                file_id = job.result[RESULT_FILE]
+                filename = FileUtil.get_result_file_location(file_id)
+                logging.debug('Deleting ' + str(filename))
+                os.remove(filename)
 
         q.empty()
         del job_list[:]

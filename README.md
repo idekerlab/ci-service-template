@@ -1,5 +1,9 @@
 # Cytoscape CI Service Template
 
+## Status
+* Pre-alpha
+* 5/15/2015: 0.2.0 release.  Test and service examples added.
+
 ## What is this?
 This is a template to setup simple CI services in Docker containers.
 

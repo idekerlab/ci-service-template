@@ -56,4 +56,5 @@ target/
 .idea
 .idea/vagrant.xml
 
+*results
 *.ipynb_checkpoints
