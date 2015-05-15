@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-
-"""API for all jobs in this system
-
-"""
-
 import os
 import logging
 
@@ -16,11 +11,11 @@ from redis import Redis
 from utils.file_util import FileUtil
 from . import RESULT_FILE, RESULT_TYPE
 
-
+# Connection to Redis Queue
 redis_conn = Redis('redis', 6379)
 q = Queue(connection=redis_conn)
 
-# List of jobs
+# List of jobs (Ordered)
 job_list = []
 
 

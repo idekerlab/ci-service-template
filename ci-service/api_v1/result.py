@@ -8,9 +8,13 @@ from flask import Response
 from jobs import redis_conn
 from . import RESULT_TYPE, RESULT_FILE
 from utils.file_util import FileUtil
+from utils.job_util import JobUtil
 
 
 class Result(Resource):
+    """Represents a result of a job
+    If the job is finished, it returns result.  Otherwise, return status of it.
+    """
 
     def __stream_file(self, file_id):
 
@@ -28,10 +32,7 @@ class Result(Resource):
         try:
             job = Job.fetch(job_id, connection=redis_conn)
         except rq.exceptions.NoSuchJobError:
-            not_found = {
-                'message': 'Job ' + job_id + ' does not exist.'
-            }
-            return not_found, 404
+            return JobUtil.get_not_found_message(job_id)
 
         if job.is_finished:
             result_type = job.meta[RESULT_TYPE]
@@ -43,9 +44,4 @@ class Result(Resource):
                 # Simply return result directly from
                 return job.result, 200
         else:
-            # Return status if not available.
-            status = {
-                'job_id': job_id,
-                'status': job.get_status()
-            }
-            return status, 200
+            return JobUtil.get_job_info(job)

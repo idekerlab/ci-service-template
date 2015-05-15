@@ -1,23 +1,27 @@
+# -*- coding: utf-8 -*-
 import logging
 
 from flask.ext.restful import Resource
-from base_service import MemoryResultService, RESULT_MEMORY
+from resource_base import MemoryResultResource, RESULT_MEMORY
 
-from tasks.graph_analysis_algorithms import GraphAnalysisAlgorithms, Betweenness, PageRank, Clustering
+from services.graph_analysis_algorithms import GraphAnalysisAlgorithms, Betweenness, PageRank
 
+# Actual instance of services
 algorithms = GraphAnalysisAlgorithms()
 algorithms.register(Betweenness())
 algorithms.register(PageRank())
-algorithms.register(Clustering())
 
 
-class GraphAnalysis(Resource):
+class GraphAlgorithmResource(Resource):
+    """
+    List of all available algorithms
+    """
 
     def get(self):
         return algorithms.get_all_algorithm_names()
 
 
-class MemoryResultServiceExample(MemoryResultService):
+class MemoryResultExampleResource(MemoryResultResource):
 
     def post(self, algorithm_name):
         """
@@ -34,9 +38,16 @@ class MemoryResultServiceExample(MemoryResultService):
         self.parser.add_argument('data', type=dict, required=True, help='Network Attr')
 
     def run_service(self, data):
+        """
+        Directly return statistics as list
+
+        :param data: Must contain algorithm name, and Cytoscape.js style graph object
+
+        :return: List of statistics
+        """
         algorithm_name = data['algorithm_name']
         algorithm = algorithms.get_algorithm(algorithm_name)
 
         logging.getLogger(__name__).debug('Calculating ' + algorithm_name)
 
-        return self.prepare_result(algorithm.calculate(data))
+        return algorithm.calculate(data)

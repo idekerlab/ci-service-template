@@ -5,6 +5,8 @@ redis:
 
 service:
   build: ci-service
+  # Remove "volumes" section when you deploy this
+  # to the production server.
   volumes:
     - ci-service:/api
   links:

@@ -25,12 +25,6 @@ class PageRank(GraphAnalysisAlgorithm):
         return nx.pagerank_scipy(util.to_networkx(graph))
 
 
-class Clustering(GraphAnalysisAlgorithm):
-
-    def calculate(self, graph):
-        return nx.clustering(util.to_networkx(graph))
-
-
 class GraphAnalysisAlgorithms():
 
     def __init__(self):

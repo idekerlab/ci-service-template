@@ -14,7 +14,7 @@ RESULT_TIME_TO_LIVE = 500000
 TIMEOUT = 60*60*24*7
 
 
-class BaseService(Resource):
+class BaseResource(Resource):
     """
     Sample service to use temp file for storing result.
     """
@@ -24,7 +24,7 @@ class BaseService(Resource):
 
     def get(self):
         message = {
-            'message': 'Service called'
+            'message': 'Service called.  Use POST to submit your job.',
         }
 
         return message, 200
@@ -59,7 +59,7 @@ class BaseService(Resource):
         return data
 
 
-class FileResultService(BaseService):
+class FileResultResource(BaseResource):
 
     def post(self):
         """
@@ -74,7 +74,7 @@ class FileResultService(BaseService):
         return FileUtil.create_result(uuid.uuid1().int, data)
 
 
-class MemoryResultService(BaseService):
+class MemoryResultResource(BaseResource):
 
     def post(self):
         """

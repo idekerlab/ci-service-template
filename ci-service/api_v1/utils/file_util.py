@@ -1,15 +1,16 @@
 import os
 import json
 
+# Location of the temp dir for result files
 RESULT_DIR = 'results'
 
 # Flask root directory
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 class FileUtil():
     """
-    Utility to generate results
+    Utility to generate results in temp files
     """
 
     @staticmethod

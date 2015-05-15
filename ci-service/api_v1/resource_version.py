@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
-
-"""Simple service information API
-Simply displays information about this API.
-This will be used to check whether the service is actually working or not.
-"""
+import logging
 
 from flask.ext.restful import Resource
 from flask import request
-import logging
 
 
-class Version(Resource):
-    """
-    API to display basic service information.
+class VersionResource(Resource):
+    """Simple service information API
+    Simply displays information about this API server.
+    This will be used to check whether the service is actually working or not.
     """
 
     def get(self):
 
-        logging.getLogger(__name__).debug('GET called for Version API')
+        logging.debug('GET called for Version resource')
 
         version = {
             'serviceName': 'Cytoscape CI template service',

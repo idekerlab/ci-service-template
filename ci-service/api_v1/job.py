@@ -9,32 +9,33 @@ import rq.exceptions
 from jobs import redis_conn, q, job_list
 from . import RESULT_TYPE, RESULT_FILE
 from utils.file_util import FileUtil
+from utils.job_util import JobUtil
 
 
 class SingleJob(Resource):
+    """A Job resource
+    All queued jobs are represented as this resource
+    """
 
     def get(self, job_id):
+        """
+        Returns status of the job
+
+        :param job_id: Job ID in the queue
+        :return: Status of job as dict
+        """
 
         try:
             job = Job.fetch(job_id, connection=redis_conn)
         except rq.exceptions.NoSuchJobError:
-            not_found = {
-                'message': 'Job ' + job_id + ' does not exist.'
-            }
-            return not_found, 404
+            return JobUtil.get_not_found_message(job_id)
 
         # Return status of the job
-        status = {
-            'job_id': job_id,
-            'status': job.get_status(),
-            'result_url': 'jobs/' + job.get_id() + '/result',
-            'result_type': job.meta['result_type']
-        }
-        return status, 200
+        return JobUtil.get_job_info(job), 200
 
     def delete(self, job_id):
         """
-        Delete a job from queue.
+        Delete a job from the queue
 
         :return:
         """
@@ -43,10 +44,7 @@ class SingleJob(Resource):
         try:
             job = Job.fetch(job_id, connection=redis_conn)
         except rq.exceptions.NoSuchJobError:
-            not_found = {
-                'message': 'Job ' + job_id + ' does not exist.'
-            }
-            return not_found, 404
+            return JobUtil.get_not_found_message(job_id)
 
         status = job.get_status()
         if status is JobStatus.STARTED:
