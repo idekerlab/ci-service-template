@@ -1,29 +1,17 @@
 # -*- coding: utf-8 -*-
 import os
+import logging
 
-from flask.ext import restful
+from flask.ext.restful import Resource
 from rq.job import Job, JobStatus
 import rq.exceptions
-from flask import Response
 
 from jobs import redis_conn, q, job_list
-from . import logger, RESULT_TYPE, RESULT_FILE
-
+from . import RESULT_TYPE, RESULT_FILE
 from utils.file_util import FileUtil
 
 
-class SingleJob(restful.Resource):
-
-    def __stream_file(self, file_id):
-
-        def generate(result_file_name):
-            filename = FileUtil.get_result_file_location(result_file_name)
-
-            f = open(filename)
-            for line in f:
-                yield line
-
-        return Response(generate(file_id))
+class SingleJob(Resource):
 
     def get(self, job_id):
 
@@ -35,22 +23,14 @@ class SingleJob(restful.Resource):
             }
             return not_found, 404
 
-        if job.is_finished:
-            result_type = job.meta[RESULT_TYPE]
-            if result_type == RESULT_FILE:
-                # Result contains file location (as UUID)
-                result_file = job.result[RESULT_FILE]
-                return self.__stream_file(result_file)
-            else:
-                # Simply return result directly from
-                return job.result, 200
-        else:
-            # Return status if not available.
-            status = {
-                'job_id': job_id,
-                'status': job.get_status()
-            }
-            return status, 200
+        # Return status of the job
+        status = {
+            'job_id': job_id,
+            'status': job.get_status(),
+            'result_url': 'jobs/' + job.get_id() + '/result',
+            'result_type': job.meta['result_type']
+        }
+        return status, 200
 
     def delete(self, job_id):
         """
@@ -76,8 +56,8 @@ class SingleJob(restful.Resource):
         result_type = job.meta[RESULT_TYPE]
         if result_type == RESULT_FILE:
             file_id = job.result['file']
-            filename = self.file_util.get_result_file_location(file_id)
-            logger.debug('deleting: ' + str(filename))
+            filename = FileUtil.get_result_file_location(file_id)
+            logging.debug('Deleting: ' + str(filename))
             os.remove(filename)
 
         job_list.remove(job.get_id())

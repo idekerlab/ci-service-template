@@ -5,20 +5,19 @@ Simply displays information about this API.
 This will be used to check whether the service is actually working or not.
 """
 
-from flask.ext import restful
+from flask.ext.restful import Resource
 from flask import request
-from . import task_logger as logger
+import logging
 
 
-class Version(restful.Resource):
+class Version(Resource):
     """
     API to display basic service information.
     """
 
     def get(self):
 
-        # This is standard logger in Flask
-        logger.debug('GET called for Version API')
+        logging.getLogger(__name__).debug('GET called for Version API')
 
         version = {
             'serviceName': 'Cytoscape CI template service',

@@ -1,8 +1,11 @@
-from flask.ext import restful
+import uuid
+from flask.ext.restful import Resource
 from flask.ext.restful import reqparse
-from jobs import q, job_list
 
+from jobs import q, job_list
+from utils.file_util import FileUtil
 from . import RESULT_FILE, RESULT_MEMORY, RESULT_TYPE
+
 
 # Lifetime of the results
 RESULT_TIME_TO_LIVE = 500000
@@ -11,7 +14,7 @@ RESULT_TIME_TO_LIVE = 500000
 TIMEOUT = 60*60*24*7
 
 
-class BaseService(restful.Resource):
+class BaseService(Resource):
     """
     Sample service to use temp file for storing result.
     """
@@ -52,6 +55,9 @@ class BaseService(restful.Resource):
     def run_service(self, data):
         pass
 
+    def prepare_result(self, data):
+        return data
+
 
 class FileResultService(BaseService):
 
@@ -63,6 +69,9 @@ class FileResultService(BaseService):
         self.parse_args()
         data = self.parser.parse_args()
         return self.submit(self.run_service, data, result_type=RESULT_FILE), 202
+
+    def prepare_result(self, data):
+        return FileUtil.create_result(uuid.uuid1().int, data)
 
 
 class MemoryResultService(BaseService):

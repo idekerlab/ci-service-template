@@ -1,8 +1,7 @@
 import time
-from base_service import MemoryResultService
-from utils.logger_factory import LoggerUtil
+import logging
 
-task_logger = LoggerUtil.get_logger(__name__)
+from base_service import MemoryResultService
 
 
 class HelloService(MemoryResultService):
@@ -14,10 +13,12 @@ class HelloService(MemoryResultService):
         self.parser.add_argument('name', type=str, required=True, help='Your name')
 
     def run_service(self, data):
-        task_logger.debug('Hello service start')
+
+        logging.getLogger(__name__).debug('Hello service start...')
 
         # Sleep for 10 seconds to emulate long-running task
         time.sleep(10)
+
         greet = {
             'message': 'Hello ' + data['name'] + '!'
         }

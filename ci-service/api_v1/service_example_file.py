@@ -1,23 +1,25 @@
-import uuid
+import logging
+
 from tasks.graph_factory import GraphFactory
 from base_service import FileResultService
-from .utils.file_util import FileUtil
-from utils.logger_factory import LoggerUtil
-
-logger = LoggerUtil.get_logger(__name__)
 
 
-class GraphGeneratorService(FileResultService):
+class FileResultServiceExample(FileResultService):
     """
     Random graph generator using NetworkX's Scale-Free graph generator.
     """
 
     def parse_args(self):
+        """
+        Parse required arguments manually
+
+        :return:
+        """
         self.parser.add_argument('num_nodes', type=int, help='Number of Nodes')
 
     def run_service(self, data):
-        logger.debug('Generate job started')
+        logging.debug('Generating graph...')
         result = GraphFactory.get_scale_free_graph(data['num_nodes'])
-        logger.debug('Generate job finished')
+        logging.debug('Graph generated!')
 
-        return FileUtil.create_result(uuid.uuid1().int, result)
+        return self.prepare_result(result)

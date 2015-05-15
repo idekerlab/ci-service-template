@@ -4,14 +4,17 @@
 
 """
 
-from flask.ext import restful
+import os
+import logging
+
+from flask.ext.restful import Resource
 from rq import Queue
 from rq.job import Job
 from rq.job import JobStatus
 from redis import Redis
-import os
+
 from utils.file_util import FileUtil
-from . import logger, RESULT_FILE, RESULT_TYPE
+from . import RESULT_FILE, RESULT_TYPE
 
 
 redis_conn = Redis('redis', 6379)
@@ -21,7 +24,7 @@ q = Queue(connection=redis_conn)
 job_list = []
 
 
-class Jobs(restful.Resource):
+class Jobs(Resource):
     """
     API for job management.
     """
@@ -59,8 +62,7 @@ class Jobs(restful.Resource):
             if result_type == RESULT_FILE:
                 file_id = job.result[RESULT_FILE]
                 filename = FileUtil.get_result_file_location(file_id)
-
-                logger.debug('deleting: ' + str(filename))
+                logging.debug('Deleting ' + str(filename))
                 os.remove(filename)
 
         q.empty()

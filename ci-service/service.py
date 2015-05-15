@@ -1,13 +1,22 @@
-from api_v1 import api, app
-
+from flask import Flask
+from flask_restful import Api
 from api_v1.service_version import Version
-from api_v1.jobs import *
-from api_v1.job import *
+from api_v1.jobs import Jobs
+from api_v1.job import SingleJob
+from api_v1.result import Result
+from api_v1.service_hello import HelloService
+from api_v1.service_example_memory import MemoryResultServiceExample, GraphAnalysis
+from api_v1.service_example_file import FileResultServiceExample
 
-from api_v1.service_hello import *
+# Shared constants for this API.
+API_VERSION = '/v1'
 
-from api_v1.service_graph_analysis import *
-from api_v1.service_graph_generator import *
+app = Flask(__name__)
+logger = app.logger
+
+api = Api(app, prefix=API_VERSION)
+
+# Endpoints
 
 # Top-level URL - simply returns service name
 api.add_resource(Version, '')
@@ -16,16 +25,17 @@ api.add_resource(Version, '')
 api.add_resource(HelloService, '/hello')
 
 # Sample services: Calculate graph statistics
-api.add_resource(Betweenness, '/algorithms/betweenness')
-api.add_resource(PageRank, '/algorithms/pagerank')
-api.add_resource(Clustering, '/algorithms/clustering')
+api.add_resource(GraphAnalysis, '/algorithms')
+api.add_resource(MemoryResultServiceExample, '/algorithms/<algorithm_name>')
 
 # Sample services: Using temp files for results
-api.add_resource(GraphGeneratorService, '/generators/scalefree')
+api.add_resource(FileResultServiceExample, '/generators/scalefree')
 
 # Task Queue
 api.add_resource(Jobs, '/jobs')
 api.add_resource(SingleJob, '/jobs/<job_id>')
+api.add_resource(Result, '/jobs/<job_id>/result')
 
+# Initialization
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=5000)
