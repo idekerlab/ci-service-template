@@ -1,8 +1,8 @@
 import networkx as nx
 from py2cytoscape import util
 
-class GraphFactory():
 
+class GraphFactory():
     @staticmethod
     def get_scale_free_graph(num_nodes):
         """

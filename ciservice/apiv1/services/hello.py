@@ -3,7 +3,6 @@ import time
 
 
 class HelloService():
-
     @staticmethod
     def say_hello(data):
         """

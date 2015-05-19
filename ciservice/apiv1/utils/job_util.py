@@ -2,7 +2,6 @@ from .. import RESULT_TYPE
 
 
 class JobUtil():
-
     @staticmethod
     def get_job_info(job):
         """
@@ -17,7 +16,7 @@ class JobUtil():
         job_info = {
             'job_id': job.get_id(),
             'status': job.get_status(),
-            'url_result': 'jobs/' + job.get_id() + '/result',
+            'url_result': 'queue/' + job.get_id() + '/result',
             'result_type': result_type
         }
 

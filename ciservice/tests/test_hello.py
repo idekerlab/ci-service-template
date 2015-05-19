@@ -2,9 +2,9 @@ import unittest
 
 
 class TestBaseService(unittest.TestCase):
-
     def test_say_hello(self):
-        from api_v1.services.hello import HelloService
+        from ..apiv1.services.hello import HelloService
+
         data = {
             'name': 'John Doe'
         }

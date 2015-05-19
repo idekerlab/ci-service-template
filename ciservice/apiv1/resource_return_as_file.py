@@ -13,4 +13,5 @@ class FileResultExampleResource(FileResultResource):
 
     def run_service(self, data):
         # Convert result into file and its location.
-        return self.prepare_result(GraphFactory.get_scale_free_graph(data['num_nodes']))
+        return self.prepare_result(
+            GraphFactory.get_scale_free_graph(data['num_nodes']))

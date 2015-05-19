@@ -2,12 +2,11 @@ import unittest
 
 
 class TestGraphAnalysisService(unittest.TestCase):
-
     def setUp(self):
         pass
 
     def test_run_service(self):
-        from api_v1.services.graph_factory import GraphFactory
+        from ..apiv1.services.graph_factory import GraphFactory
 
         num_nodes = 100
         scale_free_graph_100 = GraphFactory.get_scale_free_graph(num_nodes)

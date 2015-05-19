@@ -4,11 +4,11 @@ redis:
     - "6379:6379"
 
 service:
-  build: ci-service
+  build: ciservice
   # Remove "volumes" section when you deploy this
   # to the production server.
   volumes:
-    - ci-service:/api
+    - ciservice:/api
   links:
     - redis
   ports:

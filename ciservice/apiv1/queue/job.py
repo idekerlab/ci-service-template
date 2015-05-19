@@ -3,18 +3,19 @@ import os
 import logging
 
 from flask.ext.restful import Resource
+
 from rq.job import Job, JobStatus
 import rq.exceptions
 
 from jobs import redis_conn, q, job_list
-from . import RESULT_TYPE, RESULT_FILE
-from utils.file_util import FileUtil
-from utils.job_util import JobUtil
+from apiv1 import RESULT_TYPE, RESULT_FILE
+from apiv1.utils.file_util import FileUtil
+from apiv1.utils.job_util import JobUtil
 
 
 class SingleJob(Resource):
     """A Job resource
-    All queued jobs are represented as this resource
+    All queued queue are represented as this resource
     """
 
     def get(self, job_id):

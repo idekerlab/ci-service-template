@@ -2,9 +2,9 @@ import unittest
 
 
 class TestBaseService(unittest.TestCase):
-
     def setUp(self):
-        from api_v1.resource_base import BaseResource
+        from ..apiv1.resource_base import BaseResource
+
         self.service = BaseResource()
 
     def test_get(self):
@@ -21,4 +21,3 @@ class TestBaseService(unittest.TestCase):
     def test_submit(self):
         data = {}
         # TODO Add redis mock for testing
-        # self.service.submit(self.__dummy_function, data, result_type=RESULT_FILE)

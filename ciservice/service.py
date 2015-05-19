@@ -1,12 +1,15 @@
 from flask import Flask
 from flask_restful import Api
-from api_v1.resource_version import VersionResource
-from api_v1.jobs import Jobs
-from api_v1.job import SingleJob
-from api_v1.result import Result
-from api_v1.resource_hello import HelloResource
-from api_v1.resource_example_on_memory import MemoryResultExampleResource, GraphAlgorithmResource
-from api_v1.resource_return_as_file import FileResultExampleResource
+
+from apiv1.resource_version import VersionResource
+from apiv1.queue.jobs import Jobs
+from apiv1.queue.job import SingleJob
+from apiv1.queue.result import Result
+from apiv1.resource_hello import HelloResource
+from apiv1.resource_example_on_memory import MemoryResultExampleResource, \
+    GraphAlgorithmResource
+from apiv1.resource_return_as_file import FileResultExampleResource
+
 
 # Shared constants for this API.
 API_VERSION = '/v1'
