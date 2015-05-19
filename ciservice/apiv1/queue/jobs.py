@@ -6,16 +6,18 @@ from flask.ext.restful import Resource
 from rq import Queue
 from rq.job import Job
 from rq.job import JobStatus
+
 from redis import Redis
 
-from utils.file_util import FileUtil
-from . import RESULT_FILE, RESULT_TYPE
+from ..utils.file_util import FileUtil
+from .. import RESULT_FILE, RESULT_TYPE
+
 
 # Connection to Redis Queue
 redis_conn = Redis('redis', 6379)
 q = Queue(connection=redis_conn)
 
-# List of jobs (Ordered)
+# List of queue (Ordered)
 job_list = []
 
 
@@ -23,9 +25,10 @@ class Jobs(Resource):
     """
     API for job management.
     """
+
     def get(self):
         """
-        GET list of all jobs in the system.
+        GET list of all queue in the system.
         :return: response
         """
         res = []
@@ -41,7 +44,7 @@ class Jobs(Resource):
 
     def delete(self):
         """
-        Delete all jobs from system.
+        Delete all queue from system.
 
         :return:
         """
@@ -63,4 +66,4 @@ class Jobs(Resource):
         q.empty()
         del job_list[:]
 
-        return {'message': 'All jobs removed.'}, 200
+        return {'message': 'All queue removed.'}, 200

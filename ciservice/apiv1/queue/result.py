@@ -6,9 +6,9 @@ import rq.exceptions
 from flask import Response
 
 from jobs import redis_conn
-from . import RESULT_TYPE, RESULT_FILE
-from utils.file_util import FileUtil
-from utils.job_util import JobUtil
+from apiv1 import RESULT_TYPE, RESULT_FILE
+from apiv1.utils.file_util import FileUtil
+from apiv1.utils.job_util import JobUtil
 
 
 class Result(Resource):

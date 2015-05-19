@@ -9,7 +9,8 @@ class HelloResource(MemoryResultResource):
     """
 
     def parse_args(self):
-        self.parser.add_argument('name', type=str, required=True, help='Your name')
+        self.parser.add_argument('name', type=str, required=True,
+                                 help='Your name')
 
     def run_service(self, data):
         return HelloService.say_hello(data)

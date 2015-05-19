@@ -12,7 +12,6 @@ class VersionResource(Resource):
     """
 
     def get(self):
-
         logging.debug('GET called for Version resource')
 
         version = {

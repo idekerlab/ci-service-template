@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# ci-service-template documentation build configuration file, created by
+# ciservice-template documentation build configuration file, created by
 # sphinx-quickstart on Thu May  7 11:35:35 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -19,7 +19,7 @@ import shlex
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('../ci-service/api_v1'))
+sys.path.insert(0, os.path.abspath('../ciservice/apiv1'))
 
 # -- General configuration ------------------------------------------------
 
@@ -49,7 +49,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'ci-service-template'
+project = u'ciservice-template'
 copyright = u'2015, Keiichiro Ono'
 author = u'Keiichiro Ono'
 
@@ -203,7 +203,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ci-service-templatedoc'
+htmlhelp_basename = 'ciservice-templatedoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -225,7 +225,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'ci-service-template.tex', u'ci-service-template Documentation',
+  (master_doc, 'ciservice-template.tex', u'ciservice-template Documentation',
    u'KeiichiroOno', 'manual'),
 ]
 
@@ -255,7 +255,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'ci-service-template', u'ci-service-template Documentation',
+    (master_doc, 'ciservice-template', u'ciservice-template Documentation',
      [author], 1)
 ]
 
@@ -269,8 +269,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'ci-service-template', u'ci-service-template Documentation',
-   author, 'ci-service-template', 'One line description of project.',
+  (master_doc, 'ciservice-template', u'ciservice-template Documentation',
+   author, 'ciservice-template', 'One line description of project.',
    'Miscellaneous'),
 ]
 
