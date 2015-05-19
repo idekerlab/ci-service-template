@@ -1,8 +1,8 @@
 # Cytoscape CI Service Template
 
 ## Status
-* Pre-alpha
 * 5/18/2015: 0.2.1 release.  Directory structure has been optimized.
+    * Tests have been updated and checked with PEP8 standards 
 
 ## What is this?
 This is a template to setup simple CI services in Docker containers.
