@@ -10,6 +10,7 @@ from apiv1.resource_example_on_memory import MemoryResultExampleResource, \
     GraphAlgorithmResource
 from apiv1.resource_return_as_file import FileResultExampleResource
 
+from apiv1.resource_add_one import AddOneResource
 
 # Shared constants for this API.
 API_VERSION = '/v1'
@@ -25,6 +26,7 @@ api = Api(app, prefix=API_VERSION)
 api.add_resource(VersionResource, '')
 
 # Toy example service: Return greeting message.
+api.add_resource(AddOneResource, '/addone')
 api.add_resource(HelloResource, '/hello')
 
 # Sample services: Calculate graph statistics
