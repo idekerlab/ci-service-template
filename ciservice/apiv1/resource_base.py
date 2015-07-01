@@ -4,7 +4,7 @@ import uuid
 from flask.ext.restful import Resource, reqparse
 
 from queue.jobs import q, job_list
-from utils.file_util import FileUtil
+from .utils.file_util import FileUtil
 from . import RESULT_FILE, RESULT_MEMORY, RESULT_TYPE
 
 
