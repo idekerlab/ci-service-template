@@ -15,9 +15,11 @@ class Worker(object):
     """
     Minimalistic workers implementation for python
     """
-    def __init__(self, router, receiver=REC_PORT, sender=SEND_PORT):
-        self.__id = uuid.uuid4()
+    def __init__(self, id, router, collector, receiver=REC_PORT, sender=SEND_PORT):
+        self.__id = id
         logging.basicConfig(level=logging.DEBUG)
+
+        self.__router = router
         
 
         # 0MQ context
@@ -25,11 +27,11 @@ class Worker(object):
 
         # For accepting input
         self.__receiver = context.socket(zmq.PULL)
-        self.__receiver.connect('tcp://'+ router + ':' + str(receiver))
+        self.__receiver.connect('tcp://' + router + ':' + str(receiver))
 
         # For sending out the result
         self.__sender = context.socket(zmq.PUSH)
-        self.__sender.connect('tcp://' + router + ':' + str(sender))
+        self.__sender.connect('tcp://' + collector + ':' + str(sender))
 
 
     def __create_status(self, job_id):
@@ -44,6 +46,7 @@ class Worker(object):
     def listen(self):
         # Start listening...
         logging.info('Worker start: ID = ' + str(self.__id))
+        logging.info('IP = ' + str(self.__router))
 
         while True:
             data = self.__receiver.recv_json()
@@ -62,8 +65,6 @@ class Worker(object):
 
             # Extract JSON
 
-            sys.stdout.flush()
-
             # Do some real work....
             result = self.__run(data='')
 
@@ -78,19 +79,22 @@ class Worker(object):
 
     def __run(self, data):
         logging.info('Running task on: ' + str(self.__id))
-        g = nx.scale_free_graph(300)
+        g = nx.scale_free_graph(1000)
         bet = nx.betweenness_centrality(g)
+        logging.info('@@@@@@@@@@@@@@ Done!: ' + str(self.__id))
         return bet
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Start workers.')
 
+    parser.add_argument('id', type=int, help='worker ID.')
     parser.add_argument('router', type=str, help='router IP address.')
+    parser.add_argument('collector', type=str, help='collector IP address.')
     parser.add_argument('port', type=int, help='port number of the router.')
 
     args = parser.parse_args()
     print('Listening to ' + args.router + ':' + str(args.port) + '...')
 
-    worker = Worker(router=args.router, receiver=args.port)
+    worker = Worker(id=args.id, router=args.router, collector=args.collector, receiver=args.port)
     worker.listen()

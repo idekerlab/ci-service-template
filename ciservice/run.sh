@@ -12,5 +12,6 @@ for ((i=1; i<=$num_workers; i++)) {
 # Create temp result file directory
 mkdir apiv1/utils/results
 
+
 # Run REST API server
 python service.py

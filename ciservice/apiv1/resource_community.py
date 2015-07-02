@@ -5,19 +5,23 @@ import logging
 from .resource_base import BaseResource
 from .utils.file_util import FileUtil
 
-ROUTER_PORT = 5557
+ROUTER_PORT = 5556
 
 
 class CommunityDetectionResource(BaseResource):
 
     def __init__(self):
-        super().__init__()
-        # Message bass
+        super(CommunityDetectionResource, self).__init__()
+        # Data producer to send tasks to workers.
         context = zmq.Context()
-        # Socket to send messages on
         self.__sender = context.socket(zmq.PUSH)
         self.__sender.bind('tcp://*:' + str(ROUTER_PORT))
 
+
+    def get(self):
+        # Test to send message
+        jobid = self.submit_to_router({})
+        return jobid, 202
 
     def post(self):
         """
@@ -40,6 +44,7 @@ class CommunityDetectionResource(BaseResource):
             'job_id': job_id,
             'data': data
         }
+
         self.__sender.send_json(task)
 
         return job_id

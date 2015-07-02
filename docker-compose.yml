@@ -3,6 +3,7 @@ redis:
   ports:
     - "6379:6379"
 
+
 service:
   build: ciservice
   # Remove "volumes" section when you deploy this
@@ -13,3 +14,12 @@ service:
     - redis
   ports:
     - "80:5000"
+
+collector:
+  build: router
+
+workers:
+  build: workers/python
+  links:
+    - service
+    - collector

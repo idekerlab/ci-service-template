@@ -17,6 +17,6 @@ RUN mkdir /workers
 WORKDIR /workers
 ADD . /workers
 
-EXPOSE 5557 5558
+EXPOSE 5556 5557 5558
 
 ENTRYPOINT ["/workers/run.sh"]
