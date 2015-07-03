@@ -7,7 +7,7 @@ import argparse
 
 import networkx as nx
 
-REC_PORT = 5556
+REC_PORT = 5557
 SEND_PORT = 5558
 
 
@@ -16,7 +16,7 @@ class Worker(object):
     Minimalistic workers implementation for python
     """
     def __init__(self, id, router, collector, receiver=REC_PORT, sender=SEND_PORT):
-        self.__id = id
+        self.__id = 'External: ' + str(id)
         logging.basicConfig(level=logging.DEBUG)
 
         self.__router = router
@@ -33,8 +33,6 @@ class Worker(object):
         self.__sender = context.socket(zmq.PUSH)
         self.__sender.connect('tcp://' + collector + ':' + str(sender))
 
-        self.__monitor = context.socket(zmq.PUSH)
-        self.__monitor.connect('tcp://collector:6666')
 
     def __create_status(self, job_id):
         status = {
@@ -43,6 +41,7 @@ class Worker(object):
             'status': 'running'
         }
         return status
+
 
     def listen(self):
         # Start listening...
@@ -60,9 +59,8 @@ class Worker(object):
                 raise ValueError('job_id is missing.')
 
             # Tell collector the job is running.
-            # self.__sender.send_json(self.__create_status(jid))
+            self.__sender.send_json(self.__create_status(jid))
 
-            self.__monitor.send_json(self.__create_status(jid))
             # Extract JSON
 
             # Do some real work....
@@ -80,7 +78,7 @@ class Worker(object):
     def __run(self, data):
         g = nx.scale_free_graph(1000)
         bet = nx.betweenness_centrality(g)
-        logging.info('@Calculated by ' + str(self.__id))
+        logging.info('@Calculated by external:  ' + str(self.__id))
         return bet
 
 

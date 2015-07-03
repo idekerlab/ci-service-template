@@ -12,14 +12,22 @@ service:
     - ciservice:/api
   links:
     - redis
+    - collector
   ports:
     - "80:5000"
+    - "5556:5556"
 
-collector:
-  build: router
 
 workers:
   build: workers/python
   links:
     - service
     - collector
+
+collector:
+  build: collector
+  volumes:
+    - collector:/collector
+  ports:
+    - "5558:5558"
+    - "6666:6666"

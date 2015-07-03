@@ -1,6 +1,6 @@
 import uuid
 import zmq
-import logging
+import redis
 
 from .resource_base import BaseResource
 from .utils.file_util import FileUtil
@@ -14,14 +14,24 @@ class CommunityDetectionResource(BaseResource):
         super(CommunityDetectionResource, self).__init__()
         # Data producer to send tasks to workers.
         context = zmq.Context()
+        # Push tasks to workers
         self.__sender = context.socket(zmq.PUSH)
         self.__sender.bind('tcp://*:' + str(ROUTER_PORT))
+
+        self.__monitor = context.socket(zmq.PUSH)
+        self.__monitor.connect('tcp://collector:6666')
 
 
     def get(self):
         # Test to send message
-        jobid = self.submit_to_router({})
-        return jobid, 202
+        jobid = self.submit_to_worker({})
+        result = {
+            'job_id': jobid,
+            'status': 'queued'
+        }
+        self.__monitor.send_json(result)
+
+        return result, 202
 
     def post(self):
         """
@@ -36,7 +46,7 @@ class CommunityDetectionResource(BaseResource):
     def prepare_result(self, data):
         return FileUtil.create_result(uuid.uuid1().int, data)
 
-    def submit_to_router(self, data):
+    def submit_to_worker(self, data):
         # Generate a job ID
         job_id = str(uuid.uuid1())
 

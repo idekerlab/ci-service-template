@@ -10,10 +10,10 @@ RUN apt-get update && apt-get install -y build-essential
 RUN conda update conda
 RUN pip install pyzmq
 
-RUN mkdir /router
-WORKDIR /router
-ADD . /router
+RUN mkdir /collector
+WORKDIR /collector
+ADD . /collector
 
-EXPOSE 5556 5557 5558
+EXPOSE 5558 6666
 
-ENTRYPOINT ["/router/run.sh"]
+ENTRYPOINT ["/collector/run.sh"]
