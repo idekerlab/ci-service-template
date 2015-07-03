@@ -13,6 +13,7 @@ from apiv1.resource_return_as_file import FileResultExampleResource
 from apiv1.resource_add_one import AddOneResource
 
 from apiv1.resource_community import CommunityDetectionResource
+from apiv1.queue.queue import TaskQueue
 
 # Shared constants for this API.
 API_VERSION = '/v1'
@@ -39,6 +40,7 @@ api.add_resource(MemoryResultExampleResource, '/algorithms/<algorithm_name>')
 api.add_resource(FileResultExampleResource, '/generators/scalefree')
 
 api.add_resource(CommunityDetectionResource, '/test1')
+api.add_resource(TaskQueue, '/queue')
 
 # Task Queue
 api.add_resource(Jobs, '/jobs')
