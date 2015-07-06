@@ -58,3 +58,5 @@ target/
 
 *results
 *.ipynb_checkpoints
+
+collector/jobs
