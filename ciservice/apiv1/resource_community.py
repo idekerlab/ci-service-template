@@ -1,12 +1,14 @@
 import uuid
 import zmq
 import redis
+import logging
 
 from .resource_base import BaseResource
 from .utils.file_util import FileUtil
 
 ROUTER_PORT = 5556
 
+logging.basicConfig(level=logging.DEBUG)
 
 class CommunityDetectionResource(BaseResource):
 
@@ -55,6 +57,7 @@ class CommunityDetectionResource(BaseResource):
             'data': data
         }
 
+        logging.info('---------sending: ')
         self.__sender.send_json(task)
 
         return job_id

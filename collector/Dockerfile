@@ -8,7 +8,7 @@ MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 
 RUN apt-get update && apt-get install -y build-essential
 RUN conda update conda
-RUN pip install pyzmq
+RUN pip install pyzmq redis
 
 RUN mkdir /collector
 WORKDIR /collector

@@ -60,3 +60,6 @@ target/
 *.ipynb_checkpoints
 
 collector/jobs
+
+.DS_Store
+.Rhistory

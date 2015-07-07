@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import zmq
 import logging
+import redis
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -18,6 +19,8 @@ class StatusMonitor():
         self.__socket = context.socket(zmq.REP)
         self.__socket.bind("tcp://*:7777")
 
+
+        self.__redis_connection = redis.Redis(host='redis', port=6379, db=0)
         # List of jobs
         self.jobs = {}
         logging.info('MONITOR start = ')
@@ -35,7 +38,15 @@ class StatusMonitor():
                     job_id = s['job_id']
                     status = s['status']
                     self.jobs[job_id] = status
-                    logging.info('Current status = ' + str(self.jobs))
+
+                    self.__redis_connection.set(job_id, status) 
+
+                    logging.info('Redis: Current status = ' 
+                        + str(self.__redis_connection.get(job_id)))
+
+                    for key in self.__redis_connection.scan_iter():
+                        logging.info(str(key) + 
+                            str(self.__redis_connection.get(str(key))))
 
                 except zmq.Again:
                     break

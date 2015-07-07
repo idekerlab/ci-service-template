@@ -16,6 +16,7 @@ service:
   ports:
     - "80:5000"
     - "5556:5556"
+    - "8888:8888"
 
 
 workers:
@@ -24,10 +25,18 @@ workers:
     - service
     - collector
 
+rworkers:
+  build: workers/r
+  links:
+    - service
+    - collector
+
 collector:
   build: collector
   volumes:
     - collector:/collector
+  links:
+    - redis
   ports:
     - "5558:5558"
     - "6666:6666"
