@@ -1,9 +1,16 @@
+# Cytoscape CI sample setup
+# 
+# Rev 1
+# by Keiichiro Ono
+#
+
+# Redis server: for job management
 redis:
   image: redis
   ports:
     - "6379:6379"
 
-
+# REST API server using Flask
 service:
   build: ciservice
   # Remove "volumes" section when you deploy this
@@ -18,19 +25,21 @@ service:
     - "5556:5556"
     - "8888:8888"
 
-
+# Python workers sample
 workers:
   build: workers/python
   links:
     - service
     - collector
 
-rworkers:
-  build: workers/r
-  links:
-    - service
-    - collector
+# Workers with R/Bioconductor
+#rworkers:
+#  build: workers/r
+#  links:
+#    - service
+#    - collector
 
+# Colector /
 collector:
   build: collector
   volumes:

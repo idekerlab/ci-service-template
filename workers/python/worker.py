@@ -10,31 +10,34 @@ import networkx as nx
 REC_PORT = 5556
 SEND_PORT = 5558
 
+MONITOR_PORT = 6666
+
 
 class Worker(object):
     """
     Minimalistic workers implementation for python
     """
-    def __init__(self, id, router, collector, receiver=REC_PORT, sender=SEND_PORT):
+    def __init__(self, id, router, collector,
+                 receiver=REC_PORT, sender=SEND_PORT, monitor=MONITOR_PORT):
         self.__id = id
         logging.basicConfig(level=logging.DEBUG)
 
         self.__router = router
         
-
         # 0MQ context
         context = zmq.Context()
 
-        # For accepting input
+        # For getting input data for this worker
         self.__receiver = context.socket(zmq.PULL)
         self.__receiver.connect('tcp://' + router + ':' + str(receiver))
 
-        # For sending out the result
+        # For sending out the result to collector
         self.__sender = context.socket(zmq.PUSH)
         self.__sender.connect('tcp://' + collector + ':' + str(sender))
 
+        # for status monitoring
         self.__monitor = context.socket(zmq.PUSH)
-        self.__monitor.connect('tcp://collector:6666')
+        self.__monitor.connect('tcp://collector:' + str(monitor))
 
     def __create_status(self, job_id):
         status = {

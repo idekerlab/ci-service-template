@@ -3,27 +3,58 @@ import zmq
 import logging
 import redis
 
-
 logging.basicConfig(level=logging.DEBUG)
+
+REDIS_PORT = 6379
+
+PULL_PORT = 6666
+PUSH_PORT = 7777 # for sending back the result
 
 
 class StatusMonitor():
 
-    def __init__(self):
+    def __init__(self, push=PUSH_PORT, pull=PULL_PORT,
+                 redisp=REDIS_PORT):
+        # Prepare queue
         context = zmq.Context()
         # Socket to receive messages on
         self.__receiver = context.socket(zmq.PULL)
-        self.__receiver.bind("tcp://*:6666")
+        self.__receiver.bind("tcp://*:" + str(pull))
 
         # For sending back results
-        self.__socket = context.socket(zmq.REP)
-        self.__socket.bind("tcp://*:7777")
+        self.__sender = context.socket(zmq.REP)
+        self.__sender.bind("tcp://*:" + str(push))
 
+        # Connection to Redis server - host will be given from Docker-compose
+        # This will be used only for storing status.
+        self.__redis_connection = redis.Redis(host='redis', port=redisp, db=0)
 
-        self.__redis_connection = redis.Redis(host='redis', port=6379, db=0)
-        # List of jobs
+        # TODO: remove this - List of jobs
         self.jobs = {}
-        logging.info('MONITOR start = ')
+        logging.info('Task monitor initialized')
+
+
+    def __get_status(self):
+        # status is saved in a hash.  Simple call the hash object
+        # from redis.
+        status_hash = self.__redis_connection.hgetall(name='status')
+        serializable = []
+        for key in status_hash.keys():
+            serializable.append({
+                'job_id': key.decode("utf-8"),
+                'status': status_hash[key].decode("utf-8")
+            })
+        return serializable
+
+
+
+    def __set_status(self, message):
+        """Set status of the job to Redis DB
+        :return:
+        """
+        job_id = message['job_id']
+        status = message['status']
+        self.__redis_connection.hset(name='status', key=job_id, value=status)
 
     def listen(self):
         while True:
@@ -39,23 +70,20 @@ class StatusMonitor():
                     status = s['status']
                     self.jobs[job_id] = status
 
-                    self.__redis_connection.set(job_id, status) 
-
+                    self.__set_status(s)
                     logging.info('Redis: Current status = ' 
-                        + str(self.__redis_connection.get(job_id)))
-
-                    for key in self.__redis_connection.scan_iter():
-                        logging.info(str(key) + 
-                            str(self.__redis_connection.get(str(key))))
+                        + str(self.__redis_connection.hget(name='status', key=job_id)))
 
                 except zmq.Again:
                     break
 
             while True:
                 try:
-                    s = self.__socket.recv_json(zmq.DONTWAIT)
+                    s = self.__sender.recv_json(zmq.DONTWAIT)
                     logging.info('** New message = ' + str(s))
-                    self.__socket.send_json(self.jobs)
+                    status_list = self.__get_status()
+                    logging.info('** status = ' + str(status_list))
+                    self.__sender.send_json(status_list)
                 except zmq.Again:
                     break
 

@@ -57,7 +57,6 @@ class CommunityDetectionResource(BaseResource):
             'data': data
         }
 
-        logging.info('---------sending: ')
         self.__sender.send_json(task)
 
         return job_id

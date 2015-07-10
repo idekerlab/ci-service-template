@@ -3,9 +3,9 @@ import logging
 import os
 import json
 
-# Collector
-
 RESULT_DIR = '/collector/jobs'
+MONITOR_PORT = 6666
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -22,7 +22,7 @@ class Collector():
         self.__socket.bind("tcp://*:5555")
 
         self.__monitor = context.socket(zmq.PUSH)
-        self.__monitor.connect('tcp://127.0.0.1:6666')
+        self.__monitor.connect('tcp://127.0.0.1:' + str(MONITOR_PORT))
 
         # List of jobs
         self.jobs = job_dict
@@ -70,27 +70,15 @@ class Collector():
         temp_file = open(filename, 'w')
         json.dump(data, temp_file)
         temp_file.close()
-
         self.jobs[job_id] = filename
+
+
+    def get_result(self):
+        pass
 
     def __delete_data(self, job_id):
         pass
 
-
-class ResultPool():
-
-    def __init__(self, job_dict):
-        self.jobs = job_dict
-        context = zmq.Context()
-        self.__socket = context.socket(zmq.REP)
-        self.__socket.bind("tcp://*:5555")
-
-    def listen(self):
-        while True:
-            message = self.__socket.recv_json()
-            logging.debug(message)
-            #  Send reply back to client
-            self.__socket.send_json(self.jobs)
 
 if __name__ == '__main__':
 

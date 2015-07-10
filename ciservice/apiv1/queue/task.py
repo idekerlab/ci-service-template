@@ -21,13 +21,13 @@ COMMAND = {
     'command': None
 }
 
-class TaskQueue(Resource):
+class Task(Resource):
     """
     API for job management.
     """
 
     def __init__(self, fetch=FETCH_PORT, status=STATUS_PORT):
-        super(TaskQueue, self).__init__()
+        super(Task, self).__init__()
         # Data producer to send tasks to workers.
         context = zmq.Context()
 
@@ -42,19 +42,19 @@ class TaskQueue(Resource):
 
     def get(self):
         """
-        GET status of all jobs in the queue.
+        GET result.
         :return: response
         """
 
         # Fetch job list from
 
         status_command = COMMAND
-        status_command['command'] = 'status'
+        status_command['command'] = 'result'
 
         # Send request to the monitor
-        self.__status.send_json(status_command)
+        self.__result.send_json(status_command)
         # Get status
-        message = self.__status.recv_json()
+        message = self.__result.recv_json()
         return message, 200
 
     def delete(self):
