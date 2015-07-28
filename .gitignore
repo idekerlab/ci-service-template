@@ -63,3 +63,5 @@ collector/jobs
 
 .DS_Store
 .Rhistory
+
+file-server/data

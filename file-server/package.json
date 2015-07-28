@@ -1,0 +1,10 @@
+{
+	"name": "ci-file-server",
+	"private": true,
+	"version": "0.1.0",
+	"description": "Cytoscape CI cache server using docker",
+	"author": "Keiichiro Ono <kono@ucsd.edu>",
+	"dependencies": {
+		"express": "~4.13.1"
+	}
+}
