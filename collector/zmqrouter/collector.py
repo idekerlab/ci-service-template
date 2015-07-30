@@ -68,7 +68,7 @@ class Collector():
         filename = os.path.join(RESULT_DIR, job_id)
 
         temp_file = open(filename, 'w')
-        json.dump(data, temp_file)
+        json.dump(data, temp_file, indent=2)
         temp_file.close()
         self.jobs[job_id] = filename
 
@@ -83,6 +83,5 @@ class Collector():
 if __name__ == '__main__':
 
     job_dict = {}
-
     collector = Collector(job_dict)
     collector.listen()

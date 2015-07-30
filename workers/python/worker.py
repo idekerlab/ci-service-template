@@ -1,16 +1,16 @@
-import sys
-import time
 import zmq
-import uuid
 import logging
 import argparse
 
 import networkx as nx
+from py2cytoscape.util import *
 
 REC_PORT = 5556
 SEND_PORT = 5558
 
 MONITOR_PORT = 6666
+
+# TODO: add more samples
 
 
 class Worker(object):
@@ -69,7 +69,7 @@ class Worker(object):
             # Extract JSON
 
             # Do some real work....
-            result = self.__run(data='')
+            result = self.__run(data=data['data'])
 
             result = {
                 'worker_id': str(self.__id),
@@ -81,10 +81,15 @@ class Worker(object):
             self.__sender.send_json(result)
 
     def __run(self, data):
-        g = nx.scale_free_graph(1000)
-        bet = nx.betweenness_centrality(g)
-        logging.info('@Calculated by ' + str(self.__id))
-        return bet
+        # This is thr section you can add any worker process...
+        g = to_networkx(data)
+        logging.debug('Data in: ' + str(g))
+
+        result_json = nx.betweenness_centrality(g)
+
+        logging.debug('Calculated by ' + str(self.__id))
+
+        return result_json
 
 
 if __name__ == '__main__':

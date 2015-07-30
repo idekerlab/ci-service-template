@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run workers for 0MQ
-new_workers=7
+new_workers=2
 
 # IP Address of the router
 router_ip='service'

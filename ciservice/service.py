@@ -15,6 +15,8 @@ from apiv1.resource_add_one import AddOneResource
 from apiv1.resource_community import CommunityDetectionResource
 from apiv1.queue.queue import TaskQueue
 
+from apiv1.queue.task import Task
+
 # Shared constants for this API.
 API_VERSION = '/v1'
 
@@ -39,13 +41,17 @@ api.add_resource(MemoryResultExampleResource, '/algorithms/<algorithm_name>')
 # Sample services: Using temp files for results
 api.add_resource(FileResultExampleResource, '/generators/scalefree')
 
-api.add_resource(CommunityDetectionResource, '/test1')
-api.add_resource(TaskQueue, '/queue')
 
 # Task Queue
 api.add_resource(Jobs, '/jobs')
 api.add_resource(SingleJob, '/jobs/<job_id>')
 api.add_resource(Result, '/jobs/<job_id>/result')
+
+########### New Worker Test ################
+api.add_resource(CommunityDetectionResource, '/community')
+
+api.add_resource(TaskQueue, '/queue')
+api.add_resource(Task, '/queue/<job_id>')
 
 # Initialization
 if __name__ == '__main__':

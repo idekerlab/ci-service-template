@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask.ext.restful import Resource
-
 import zmq
-
 
 QUEUED = 'queued'
 FINISHED = 'finished'
