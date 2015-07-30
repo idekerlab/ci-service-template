@@ -11,6 +11,15 @@ var app = express();
 var counter = 0;
 
 /**
+*/
+app.get('/', function (req, res) {
+	var message = {
+		message: 'File cache server is running...'
+	}
+    res.send(message)
+});
+
+/**
 For streaming data from file
 */
 app.get('/test', function (req, res) {
@@ -47,7 +56,7 @@ var server = app.listen(PORT, function () {
 
   var host = server.address().address;
   var port = server.address().port;
-
+  console.log(server.address())
   console.log("File Server is listening at http://%s:%s", host, port);
 
 });

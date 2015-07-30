@@ -50,3 +50,12 @@ collector:
     - "5558:5558"
     - "6666:6666"
     - "5001:5001" # for Flask
+
+
+dataserver:
+  build: file-server
+  ports:
+    - "3000:3000"
+  links:
+    - service
+    - collector

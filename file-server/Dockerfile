@@ -4,8 +4,7 @@ FROM node:latest
 
 MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 
-RUN apt-get update && apt-get install -y \
-		build-essential
+RUN apt-get update && apt-get install -y build-essential
 
 RUN npm update -g && npm install forever -g
 
