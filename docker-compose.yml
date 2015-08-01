@@ -20,6 +20,7 @@ service:
   links:
     - redis
     - collector
+    - dataserver
   ports:
     - "80:5000"
     - "5556:5556"
@@ -52,10 +53,29 @@ collector:
     - "5001:5001" # for Flask
 
 
+# For input data caching
 dataserver:
   build: file-server
+  links:
+    - redis
   ports:
     - "3000:3000"
-  links:
-    - service
-    - collector
+
+
+# For result data caching
+resultserver:
+  build: file-server
+  ports:
+    - "3001:3000"
+
+
+# Frontend to test CI
+notebook:
+  image: idekerlab/vizbi-2015
+  ports:
+    - "8080:8888"
+  volumes:
+    - sample-notebooks:/notebooks
+  environment:
+    - PASSWORD=citest
+    - USE_HTTP=1

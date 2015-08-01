@@ -6,7 +6,7 @@ MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 
 RUN apt-get update && apt-get install -y build-essential
 
-RUN npm update -g && npm install forever -g
+RUN npm update -g && npm install forever node-uuid redis -g
 
 RUN mkdir /app
 WORKDIR /app

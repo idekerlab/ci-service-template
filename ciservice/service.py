@@ -15,6 +15,8 @@ from apiv1.resource_add_one import AddOneResource
 from apiv1.resource_community import CommunityDetectionResource
 from apiv1.queue.queue import TaskQueue
 
+from apiv1.resource_upload import UploadResource
+
 from apiv1.queue.task import Task
 
 # Shared constants for this API.
@@ -52,6 +54,9 @@ api.add_resource(CommunityDetectionResource, '/community')
 
 api.add_resource(TaskQueue, '/queue')
 api.add_resource(Task, '/queue/<job_id>')
+
+######## File uploader #########
+api.add_resource(UploadResource, '/upload')
 
 # Initialization
 if __name__ == '__main__':
