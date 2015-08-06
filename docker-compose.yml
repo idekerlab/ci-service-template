@@ -15,8 +15,8 @@ service:
   build: ciservice
   # Remove "volumes" section when you deploy this
   # to the production server.
-  volumes:
-    - ciservice:/api
+  # volumes:
+  #   - ciservice:/api
   links:
     - redis
     - collector
@@ -32,6 +32,7 @@ workers:
   links:
     - service
     - collector
+    - dataserver
 
 # Workers with R/Bioconductor
 #rworkers:
@@ -43,8 +44,8 @@ workers:
 # Colector /
 collector:
   build: collector
-  volumes:
-    - collector:/collector
+  # volumes:
+  #   - collector:/collector
   links:
     - redis
   ports:

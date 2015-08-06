@@ -1,6 +1,9 @@
 import zmq
 import logging
 import argparse
+import requests
+import time
+import json
 
 import networkx as nx
 from py2cytoscape.util import *
@@ -57,10 +60,10 @@ class Worker(object):
 
             # Validate data
             # TODO: Exception handler
-            if 'job_id' in data.keys():
+            if 'job_id' in data.keys() and 'data' in data.keys():
                 jid = data['job_id']
             else:
-                raise ValueError('job_id is missing.')
+                raise ValueError('job_id or data location is missing.')
 
             # Tell collector the job is running.
             # self.__sender.send_json(self.__create_status(jid))
@@ -69,12 +72,25 @@ class Worker(object):
             # Extract JSON
 
             # Do some real work....
-            result = self.__run(data=data['data'])
+
+            # Fetch data from file server
+            data_location = data['data']
+            logging.info('####### Data location => ' + str(data_location))
+
+
+            response = requests.get(data_location)
+
+            input_data = response.json()
+            input_dict = json.loads(input_data)
+            logging.info('***TYPE')
+            logging.info(type(input_dict))
+
+            final_result = self.__run(data=input_dict)
 
             result = {
                 'worker_id': str(self.__id),
                 'job_id': jid,
-                'result': result
+                'result': final_result
             }
 
             # Send results to sink

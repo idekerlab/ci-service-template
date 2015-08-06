@@ -2,13 +2,19 @@ import uuid
 import zmq
 import logging
 
+from flask import request
+import requests as client
+
 from .resource_base import BaseResource
 from .utils.file_util import FileUtil
 
 ROUTER_PORT = 5556
 STATUS_PORT = 6666
 
+INPUT_DATA_SERVER_LOCATION = 'http://dataserver:3000/'
+
 logging.basicConfig(level=logging.DEBUG)
+
 
 class CommunityDetectionResource(BaseResource):
     """
@@ -26,7 +32,6 @@ class CommunityDetectionResource(BaseResource):
 
         self.__monitor = context.socket(zmq.PUSH)
         self.__monitor.connect('tcp://collector:6666')
-
 
     def get(self):
         """
@@ -46,11 +51,18 @@ class CommunityDetectionResource(BaseResource):
 
         :return:
         """
-        self.parse_args()
-        data = self.parser.parse_args()
+        logging.debug('POST: Task')
+
+        req = client.post(INPUT_DATA_SERVER_LOCATION + 'data', json=request.stream.read(),
+                          stream=True)
+        logging.debug('File server response Data = ' + str(req.json()))
+        file_id = req.json()['fileId']
+        # self.parse_args()
+        # data = self.parser.parse_args()
         # logging.debug('Original Data = ' + str(data))
 
-        job_id = self.submit_to_worker(data)
+        job_id = self.submit_to_worker(file_id)
+
         current_status = {
             'job_id': job_id,
             'status': 'queued'
@@ -79,16 +91,19 @@ class CommunityDetectionResource(BaseResource):
             help='Network Attr'
         )
 
-
-    def submit_to_worker(self, data):
+    def submit_to_worker(self, input_data_location):
         # Generate unique job ID
         job_id = str(uuid.uuid4())
 
+        # The worker will get location of data, not actual data.
         task = {
             'job_id': job_id,
-            'data': data
+            'data': INPUT_DATA_SERVER_LOCATION + 'data/' + input_data_location
         }
 
+        logging.debug('Task JSON = ' + str(task))
         self.__sender.send_json(task)
+
+        logging.debug('=========== SUBMIT DONE')
 
         return job_id

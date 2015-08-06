@@ -35,6 +35,9 @@ For streaming data from file
 */
 app.get('/data/:id', function(req, res) {
 	var fileId = req.params.id;
+
+	console.log('Opening input data file: ' + fileId);
+	
 	var stream = fs.createReadStream(__dirname + DATA_DIR + fileId + '.json');
 	stream.pipe(res);
 });
