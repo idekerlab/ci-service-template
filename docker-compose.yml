@@ -33,6 +33,14 @@ workers:
     - service
     - collector
     - dataserver
+    - resultserver
+
+#workers2:
+#  build: workers/python2
+#  links:
+#    - service
+#    - collector
+#    - dataserver
 
 # Workers with R/Bioconductor
 #rworkers:
@@ -66,17 +74,19 @@ dataserver:
 # For result data caching
 resultserver:
   build: file-server
+  links:
+    - redis
   ports:
     - "3001:3000"
 
 
 # Frontend to test CI
-notebook:
-  image: idekerlab/vizbi-2015
-  ports:
-    - "8080:8888"
-  volumes:
-    - sample-notebooks:/notebooks
-  environment:
-    - PASSWORD=citest
-    - USE_HTTP=1
+#notebook:
+#  image: idekerlab/vizbi-2015
+#  ports:
+#    - "8080:8888"
+#  volumes:
+#    - sample-notebooks:/notebooks
+#  environment:
+#    - PASSWORD=citest
+#    - USE_HTTP=1

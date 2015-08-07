@@ -104,6 +104,4 @@ class CommunityDetectionResource(BaseResource):
         logging.debug('Task JSON = ' + str(task))
         self.__sender.send_json(task)
 
-        logging.debug('=========== SUBMIT DONE')
-
         return job_id

@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # Run workers for 0MQ
-new_workers=2
+new_workers=7
 
 # IP Address of the router
 router_ip='service'
 collector_ip='collector'
+
 router_port=5556
 collector_port=5558
 

@@ -2,8 +2,10 @@ import zmq
 import logging
 import argparse
 import requests
-import time
 import json
+
+import requests as client
+from flask import request
 
 import networkx as nx
 from py2cytoscape.util import *
@@ -12,6 +14,8 @@ REC_PORT = 5556
 SEND_PORT = 5558
 
 MONITOR_PORT = 6666
+
+RESULT_SERVER_LOCATION = 'http://resultserver:3000/'
 
 # TODO: add more samples
 
@@ -77,7 +81,6 @@ class Worker(object):
             data_location = data['data']
             logging.info('####### Data location => ' + str(data_location))
 
-
             response = requests.get(data_location)
 
             input_data = response.json()
@@ -87,10 +90,15 @@ class Worker(object):
 
             final_result = self.__run(data=input_dict)
 
+            req = client.post(RESULT_SERVER_LOCATION + 'data', json=final_result, stream=True)
+            file_id = req.json()['fileId']
+
+            logging.debug('Result File server response Data = ' + str(req.json()))
+
             result = {
                 'worker_id': str(self.__id),
                 'job_id': jid,
-                'result': final_result
+                'result': RESULT_SERVER_LOCATION + 'data/' + str(file_id)
             }
 
             # Send results to sink
