@@ -3,9 +3,9 @@ import logging
 import argparse
 import requests
 import json
+import redis
 
 import requests as client
-from flask import request
 
 import networkx as nx
 from py2cytoscape.util import *
@@ -19,20 +19,31 @@ RESULT_SERVER_LOCATION = 'http://resultserver:3000/'
 
 # TODO: add more samples
 
+logging.basicConfig(level=logging.DEBUG)
 
-class Worker(object):
+class BaseWorker(object):
     """
     Minimalistic workers implementation for python
     """
     def __init__(self, id, router, collector,
                  receiver=REC_PORT, sender=SEND_PORT, monitor=MONITOR_PORT):
-        self.__id = id
-        logging.basicConfig(level=logging.DEBUG)
 
+        self.__redis_conn = redis.Redis('redis', 6379)
+
+        self.__id = id
         self.__router = router
         
         # 0MQ context
         context = zmq.Context()
+        endpoint = 'community'
+
+        registered = self.__redis_conn.hgetall('endpoints')
+        if endpoint not in registered.keys():
+            self.__redis_conn.hset('endpoints', endpoint, receiver)
+            logging.info('Service registered: ' + endpoint + ', Port ' + str(receiver))
+
+        # reg.send_json(endpoint)
+
 
         # For getting input data for this worker
         self.__receiver = context.socket(zmq.PULL)
@@ -127,5 +138,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print('Listening to ' + args.router + ':' + str(args.port) + '...')
 
-    worker = Worker(id=args.id, router=args.router, collector=args.collector, receiver=args.port)
+    worker = BaseWorker(id=args.id, router=args.router, collector=args.collector,
+                       receiver=args.port)
     worker.listen()

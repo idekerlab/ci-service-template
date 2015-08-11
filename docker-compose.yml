@@ -22,9 +22,10 @@ service:
     - collector
     - dataserver
   ports:
-    - "80:5000"
+    - "80:5000" # REST API for users
     - "5556:5556"
     - "8888:8888"
+    - "9999:9999" # endpoint registration
 
 # Python workers sample
 workers:
@@ -32,6 +33,7 @@ workers:
   links:
     - service
     - collector
+    - redis
     - dataserver
     - resultserver
 

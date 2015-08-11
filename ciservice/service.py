@@ -1,5 +1,8 @@
+import traceback
 from flask import Flask
 from flask_restful import Api
+
+import logging
 
 from apiv1.resource_version import VersionResource
 from apiv1.queue.jobs import Jobs
@@ -12,12 +15,17 @@ from apiv1.resource_return_as_file import FileResultExampleResource
 
 from apiv1.resource_add_one import AddOneResource
 
-from apiv1.resource_community import CommunityDetectionResource
+from apiv1.queue.register_port import PortManager
+
 from apiv1.queue.queue import TaskQueue
 
 from apiv1.resource_upload import UploadResource
 
 from apiv1.queue.task import Task
+
+from apiv1.resource_submit import SubmitResource
+from apiv1.resource_services import ServicesResource
+
 
 # Shared constants for this API.
 API_VERSION = '/v1'
@@ -25,6 +33,9 @@ API_VERSION = '/v1'
 app = Flask(__name__)
 logger = app.logger
 
+logging.debug('------------- App is ready 1--------------')
+
+traceback.print_stack()
 api = Api(app, prefix=API_VERSION)
 
 # Endpoints
@@ -50,7 +61,8 @@ api.add_resource(SingleJob, '/jobs/<job_id>')
 api.add_resource(Result, '/jobs/<job_id>/result')
 
 ########### New Worker Test ################
-api.add_resource(CommunityDetectionResource, '/community')
+api.add_resource(ServicesResource, '/services')
+api.add_resource(SubmitResource, '/services/<string:name>')
 
 api.add_resource(TaskQueue, '/queue')
 api.add_resource(Task, '/queue/<job_id>')
@@ -58,6 +70,20 @@ api.add_resource(Task, '/queue/<job_id>')
 ######## File uploader #########
 api.add_resource(UploadResource, '/upload')
 
+# Worker registration
+# from multiprocessing import Process
+#
+#
+# def f():
+#     worker_manager = PortManager(api, app)
+#     worker_manager.listen()
+#
+# p = Process(target=f, args=())
+# p.start()
+#
+# logging.debug('------------- Listener OK.--------------')
+
 # Initialization
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=5000)
+    app.run(host='0.0.0.0', debug=False, port=5000)
+    logging.debug('------------- App is ready 2--------------')
