@@ -54,6 +54,7 @@ class StatusMonitor():
         """
         job_id = message['job_id']
         status = message['status']
+
         self.__redis_connection.hset(name='status', key=job_id, value=status)
 
     def listen(self):

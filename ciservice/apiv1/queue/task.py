@@ -4,6 +4,14 @@ from flask.ext.restful import Resource
 from flask import redirect, url_for
 
 import zmq
+import redis
+import logging
+import requests
+
+from flask import Response
+from flask import stream_with_context
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 QUEUED = 'queued'
@@ -27,7 +35,7 @@ class Task(Resource):
     API for job management.
     """
 
-    def __init__(self, fetch=FETCH_PORT, status=STATUS_PORT):
+    def __init__(self, fetch=FETCH_PORT, status=STATUS_PORT, redisp=6379):
         super(Task, self).__init__()
         # Data producer to send tasks to workers.
         context = zmq.Context()
@@ -42,12 +50,21 @@ class Task(Resource):
         self.__status = context.socket(zmq.REQ)
         self.__status.connect('tcp://collector:' + str(status))
 
+        self.__redis_connection = redis.Redis(host='redis', port=redisp, db=0)
+
     def get(self, job_id):
         """
         GET result.
         :return: response
         """
-        return redirect(url_for('http://collector:5001/results/' + str(job_id)))
+        result_location = self.__redis_connection.hget(name='results', key=job_id)
+        logging.debug('============ result ID2: ' + str(result_location))
+
+        req = requests.get(str(result_location), stream=True)
+        return Response(
+            stream_with_context(req.iter_content()),
+            # content_type=req.headers['content-type']
+        )
 
 
     def delete(self):

@@ -1,6 +1,6 @@
 # Cytoscape CI sample setup
 # 
-# Rev 1
+# Rev 2
 # by Keiichiro Ono
 #
 
@@ -21,6 +21,7 @@ service:
     - redis
     - collector
     - dataserver
+    - resultserver
   ports:
     - "80:5000" # REST API for users
     - "5556:5556"
@@ -58,6 +59,7 @@ collector:
   #   - collector:/collector
   links:
     - redis
+    - resultserver
   ports:
     - "5558:5558"
     - "6666:6666"
