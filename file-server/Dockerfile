@@ -10,6 +10,7 @@ RUN npm update -g && npm install forever node-uuid redis -g
 
 RUN mkdir /app
 WORKDIR /app
+RUN mkdir /app/data
 ADD . /app
 RUN npm install
 

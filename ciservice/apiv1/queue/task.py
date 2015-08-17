@@ -58,11 +58,11 @@ class Task(Resource):
         :return: response
         """
         result_location = self.__redis_connection.hget(name='results', key=job_id)
-        logging.debug('============ result ID2: ' + str(result_location))
+        logging.debug('============ result ID3: ' + str(result_location))
 
         req = requests.get(str(result_location), stream=True)
         return Response(
-            stream_with_context(req.iter_content()),
+            stream_with_context(req.iter_content())
             # content_type=req.headers['content-type']
         )
 

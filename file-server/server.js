@@ -34,6 +34,8 @@ app.get('/', function(req, res) {
 For streaming data from file
 */
 app.get('/data/:id', function(req, res) {
+	console.log('Opening input data file: ' + fileId);
+	
 	var fileId = req.params.id;
 
 	console.log('Opening input data file: ' + fileId);
