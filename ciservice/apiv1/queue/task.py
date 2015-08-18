@@ -9,7 +9,7 @@ import logging
 import requests
 
 from flask import Response
-from flask import stream_with_context
+from flask import stream_with_context, redirect
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -58,13 +58,16 @@ class Task(Resource):
         :return: response
         """
         result_location = self.__redis_connection.hget(name='results', key=job_id)
-        logging.debug('============ result ID3: ' + str(result_location))
+        logging.debug('!!!!!!!!!! 4 Fetching result: ' + str(result_location))
 
+        # Stream the result from the file server
+        import time
+        start = time.clock()
         req = requests.get(str(result_location), stream=True)
-        return Response(
-            stream_with_context(req.iter_content())
-            # content_type=req.headers['content-type']
-        )
+        end = time.clock()
+        logging.debug('TIME: ' + str(end-start))
+
+        return Response(req.content, mimetype='application/json')
 
 
     def delete(self):

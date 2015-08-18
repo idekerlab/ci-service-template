@@ -1,17 +1,11 @@
 import zmq
 import logging
-import argparse
 import requests
 import json
 import redis
-
 import requests as client
 
-import networkx as nx
-from py2cytoscape.util import *
-
 SEND_PORT = 5558
-
 MONITOR_PORT = 6666
 
 RESULT_SERVER_LOCATION = 'http://resultserver:3000/'
@@ -102,7 +96,8 @@ class BaseWorker(object):
             req = client.post(RESULT_SERVER_LOCATION + 'data', data=final_result, stream=True)
             file_id = req.json()['fileId']
 
-            logging.debug('Result File server response Data = ' + str(req.json()))
+            logging.debug('@@@@@@@@@@Result File server response Data = ' + str(
+                req.json()))
 
             result = {
                 'worker_id': str(self.id),

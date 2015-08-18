@@ -30,7 +30,7 @@ service:
 
 # Python workers sample
 workers:
-  build: workers/python
+  build: workers/pyworker
   links:
     - service
     - collector

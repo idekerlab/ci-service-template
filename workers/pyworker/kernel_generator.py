@@ -1,23 +1,33 @@
 # -*- coding: utf-8 -*-
 import logging
 import arg_parser as parser
-import cStringIO
 
 from base_worker import BaseWorker
-from kernel.kernel_generator import KernelGenerator
+from hdsubnetfinder.kernel.kernel_generator import KernelGenerator
+import hdsubnetfinder.kernel.kernel_util as util
+
 
 class KernelGeneratorWorker(BaseWorker):
 
     def run(self, data):
         # Parse input data
         sif_url = data['network_url']
-        generator = KernelGenerator(sif_url)
-        output = cStringIO.StringIO()
-        kernel = generator.write_kernel(output)
-        output.close()
-        logging.debug('Kernel computation finished.')
+        generator = KernelGenerator()
+        kernel = generator.create_kernel(sif_url)
+        logging.debug('========== Kernel computation finished =========')
 
-        return kernel
+        # Create file from this
+        util.write_kernel(kernel, output_file='temp.kernel.txt')
+
+        kernel_array = []
+        counter=0
+
+        for line in open('temp.kernel.txt', 'r'):
+            counter += 1
+            logging.debug('###2 LINE: ' + str(counter))
+            kernel_array.append(line)
+
+        return ''.join(kernel_array)
 
 
 if __name__ == '__main__':
