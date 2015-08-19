@@ -10,6 +10,7 @@ import hdsubnetfinder.kernel.kernel_util as util
 
 KERNEL_FILE_SERVER = 'http://kernelserver:3000/'
 
+
 class KernelGeneratorWorker(BaseWorker):
 
     def run(self, data):
@@ -18,7 +19,6 @@ class KernelGeneratorWorker(BaseWorker):
         generator = KernelGenerator()
         kernel = generator.create_kernel(sif_url)
         logging.debug('========== Kernel computation finished =========')
-
 
         req = client.post(KERNEL_FILE_SERVER + 'data',
                           data=util.get_kernel_as_string(kernel), stream=True)
@@ -44,7 +44,6 @@ class KernelGeneratorWorker(BaseWorker):
         # Save kernel file in dedicated file server only for the Kernel
 
         pass
-
 
 
 if __name__ == '__main__':

@@ -2,11 +2,8 @@
 
 from flask.ext.restful import Resource
 import zmq
+import redis
 
-QUEUED = 'queued'
-FINISHED = 'finished'
-FAILED = 'failed'
-STARTED = 'started'
 
 # Port for fetching task status
 FETCH_PORT = 5555
@@ -14,46 +11,42 @@ FETCH_PORT = 5555
 # Port for status monitor
 STATUS_PORT = 7777
 
-# Message template
-COMMAND = {
-    'command': None
-}
+REDIS_PORT = 6379
+
+TAG_STATUS = 'status'
+TAG_JOB_ID = 'job_id'
+
 
 class TaskQueue(Resource):
     """
     API for job management.
     """
 
-    def __init__(self, fetch=FETCH_PORT, status=STATUS_PORT):
+    def __init__(self, fetch=FETCH_PORT, status=STATUS_PORT, redisp=REDIS_PORT):
         super(TaskQueue, self).__init__()
-        # Data producer to send tasks to workers.
-        context = zmq.Context()
+        self.__redis_connection = redis.Redis(host='redis', port=redisp, db=0)
 
-        ##### Connections to other modules #####
-        # For fetching data from collector
-        self.__result = context.socket(zmq.REQ)
-        self.__result.connect('tcp://collector:' + str(fetch))
+    def __get_status(self):
+        status_hash = self.__redis_connection.hgetall(name=TAG_STATUS)
+        serializable = []
+        keys = status_hash.keys()
 
-        # for status checking
-        self.__status = context.socket(zmq.REQ)
-        self.__status.connect('tcp://collector:' + str(status))
+        for key in keys:
+            serializable.append(
+                {
+                    TAG_JOB_ID: key.decode("utf-8"),
+                    TAG_STATUS: status_hash[key].decode("utf-8")
+                }
+            )
+        return serializable
 
     def get(self):
-        """
-        GET status of all jobs in the queue.
-        :return: response
-        """
-
-        # Fetch job list from
-
-        status_command = COMMAND
-        status_command['command'] = 'status'
-
-        # Send request to the monitor
-        self.__status.send_json(status_command)
-        # Get status
-        message = self.__status.recv_json()
-        return message, 200
+        status_message = self.__get_status()
+        return status_message, 200
 
     def delete(self):
+        """
+        Delete all jobs
+        :return:
+        """
         return 200

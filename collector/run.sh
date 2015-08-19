@@ -9,6 +9,5 @@ mkdir /collector/jobs
 # Task monitor
 python ./zmqrouter/status_monitor.py &
 
-python ./zmqrouter/collector.py &
-
-python ./zmqrouter/streamer.py
+# Result collector
+python ./zmqrouter/collector.py

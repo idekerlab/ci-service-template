@@ -30,6 +30,7 @@ COMMAND = {
     'command': None
 }
 
+
 class Task(Resource):
     """
     API for job management.

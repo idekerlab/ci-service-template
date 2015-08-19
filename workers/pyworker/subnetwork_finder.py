@@ -1,46 +1,55 @@
 import logging
-import uuid
 import arg_parser as parser
 
 from base_worker import BaseWorker
 from hdsubnetfinder.subnetwork.sub_network_finder import SubNetworkFinder
 from hdsubnetfinder.kernel.kernel_generator import KernelGenerator
+import hdsubnetfinder.subnetwork.network_util as util
 
 
 class SubnetworkFinderWorker(BaseWorker):
 
+    def __init__(self, endpoint, id, router, collector, receiver):
+        super(SubnetworkFinderWorker, self)\
+            .__init__(endpoint, id, router, collector, receiver)
+
+        self.__finders = {}
+
     def run(self, data):
-        # Parse input data
+        logging.debug('Worker ID: ' + str(self.id) + ' Building finder '
+                                                     '=========')
+        logging.debug(data)
+
         kernel_file_url = data['kernel_url']
         network_file_url = data['network_url']
+        query = data['query']
 
-        generator = KernelGenerator()
-        kernel = generator.create_kernel_from_file(kernel_file_url)
+        # Check finder exists or not
+        if kernel_file_url in self.__finders.keys():
+            logging.debug('Kernel found.  No need to create finder')
+            finder = self.__finders[kernel_file_url]
+        else:
+            logging.debug('Building Finder...')
+            generator = KernelGenerator()
+            kernel = generator.create_kernel_from_file(kernel_file_url)
+            network = util.read_sif(network_file_url)
+            finder = SubNetworkFinder(kernel=kernel, network=network)
+            self.__finders[kernel_file_url] = finder
+            logging.debug('Building Finder... Done!')
 
-        finder = SubNetworkFinder(kernel, network_file_url)
-        logging.debug('========== Finder created =========')
+        # Now find subnet
+        logging.debug('******** Query: ' + str(query))
+        subnetwork = finder.get_sub_network(query)
+        logging.debug('========== Sub Network found: Size = ' + str(len(
+            subnetwork)))
 
-        # Register kernel information
-
-        self.redis_conn.hset('kernels', str(uuid.uuid4()), sif_url)
-
-        # Create file from this
-        util.write_kernel(kernel, output_file='temp.kernel.txt')
-
-        kernel_array = []
-        counter = 0
-
-        for line in open('temp.kernel.txt', 'r'):
-            counter += 1
-            kernel_array.append(line)
-
-        return ''.join(kernel_array)
+        return subnetwork
 
 
 if __name__ == '__main__':
     args = parser.get_args()
 
-    worker = KernelGeneratorWorker(
+    worker = SubnetworkFinderWorker(
         endpoint=args.endpoint,
         id=args.id,
         router=args.router,

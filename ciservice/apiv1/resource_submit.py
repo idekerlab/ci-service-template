@@ -64,6 +64,8 @@ class SubmitResource(BaseResource):
             'status': 'queued'
         }
 
+        logging.debug('Sending status: ' + str(current_status))
+
         # send status of job to monitor
         self.__monitor.send_json(current_status)
 

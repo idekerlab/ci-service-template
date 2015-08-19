@@ -1,14 +1,12 @@
 #
-# Router and collector for zeromq-based Python workers
+# Monitor and collector for zeromq-based Python workers
 #
-
-FROM continuumio/miniconda3
+FROM python:3.4
 
 MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 
 RUN apt-get update && apt-get install -y build-essential
-RUN conda update conda
-RUN pip install pyzmq redis Flask flask-restful
+RUN pip install pyzmq redis
 
 RUN mkdir /collector
 WORKDIR /collector

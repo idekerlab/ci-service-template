@@ -67,8 +67,8 @@ api.add_resource(Result, '/jobs/<job_id>/result')
 ########### New Worker Test ################
 api.add_resource(ServicesResource, '/services')
 api.add_resource(KernelResource, '/services/kernels')
-api.add_resource(SubnetFinderResource, '/services/subnetfinder')
-api.add_resource(FindSubnetResource, '/services/subnetfinder/<string:name>')
+# api.add_resource(SubnetFinderResource, '/services/subnetfinder')
+# api.add_resource(FindSubnetResource, '/services/subnetfinder/<string:name>')
 api.add_resource(SubmitResource, '/services/<string:name>')
 
 api.add_resource(TaskQueue, '/queue')
@@ -76,19 +76,6 @@ api.add_resource(Task, '/queue/<job_id>')
 
 ######## File uploader #########
 api.add_resource(UploadResource, '/upload')
-
-# Worker registration
-# from multiprocessing import Process
-#
-#
-# def f():
-#     worker_manager = PortManager(api, app)
-#     worker_manager.listen()
-#
-# p = Process(target=f, args=())
-# p.start()
-#
-# logging.debug('------------- Listener OK.--------------')
 
 # Initialization
 if __name__ == '__main__':

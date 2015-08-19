@@ -37,7 +37,6 @@ class BaseWorker(object):
 
         # reg.send_json(endpoint)
 
-
         # For getting input data for this worker
         self.__receiver = context.socket(zmq.PULL)
         self.__receiver.connect('tcp://' + router + ':' + str(receiver))
@@ -83,7 +82,7 @@ class BaseWorker(object):
 
             # Fetch data from file server
             data_location = data['data']
-            logging.info('####### Data location => ' + str(data_location))
+            logging.info('Data location => ' + str(data_location))
 
             response = client.get(data_location)
 
@@ -95,15 +94,13 @@ class BaseWorker(object):
             req = client.post(RESULT_SERVER_LOCATION + 'data', json=final_result, stream=True)
             file_id = req.json()['fileId']
 
-            logging.debug('@@@@@@@@@@Result File server response Data = ' + str(
-                req.json()))
+            logging.debug('# Result saved to server = ' + str(req.json()))
 
             result = {
                 'worker_id': str(self.id),
                 'job_id': jid,
                 'result': RESULT_SERVER_LOCATION + 'data/' + str(file_id)
             }
-
 
             # Send results to sink
             self.__sender.send_json(result)
