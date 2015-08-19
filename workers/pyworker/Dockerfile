@@ -9,8 +9,7 @@ MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 
 RUN apt-get update && apt-get install -y build-essential
 RUN conda update conda && conda install scipy numpy
-RUN pip install Flask redis pyzmq hdsubnetfinder
-
+RUN pip install hdsubnetfinder redis pyzmq
 RUN mkdir /workers
 WORKDIR /workers
 ADD . /workers

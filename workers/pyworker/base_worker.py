@@ -1,6 +1,5 @@
 import zmq
 import logging
-import requests
 import json
 import redis
 import requests as client
@@ -86,14 +85,14 @@ class BaseWorker(object):
             data_location = data['data']
             logging.info('####### Data location => ' + str(data_location))
 
-            response = requests.get(data_location)
+            response = client.get(data_location)
 
             input_data = response.json()
             input_dict = json.loads(input_data)
 
             final_result = self.run(data=input_dict)
 
-            req = client.post(RESULT_SERVER_LOCATION + 'data', data=final_result, stream=True)
+            req = client.post(RESULT_SERVER_LOCATION + 'data', json=final_result, stream=True)
             file_id = req.json()['fileId']
 
             logging.debug('@@@@@@@@@@Result File server response Data = ' + str(
@@ -105,8 +104,12 @@ class BaseWorker(object):
                 'result': RESULT_SERVER_LOCATION + 'data/' + str(file_id)
             }
 
+
             # Send results to sink
             self.__sender.send_json(result)
 
     def run(self, data):
+        pass
+
+    def post_process(self, result, result_location):
         pass

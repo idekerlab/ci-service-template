@@ -28,6 +28,10 @@ from apiv1.resource_services import ServicesResource
 
 
 # Shared constants for this API.
+from apiv1.resource_kernel import KernelResource
+from apiv1.resource_subnetfinder import SubnetFinderResource
+from apiv1.resource_find_subnet import FindSubnetResource
+
 API_VERSION = '/v1'
 
 app = Flask(__name__)
@@ -62,6 +66,9 @@ api.add_resource(Result, '/jobs/<job_id>/result')
 
 ########### New Worker Test ################
 api.add_resource(ServicesResource, '/services')
+api.add_resource(KernelResource, '/services/kernels')
+api.add_resource(SubnetFinderResource, '/services/subnetfinder')
+api.add_resource(FindSubnetResource, '/services/subnetfinder/<string:name>')
 api.add_resource(SubmitResource, '/services/<string:name>')
 
 api.add_resource(TaskQueue, '/queue')

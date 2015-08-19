@@ -22,6 +22,7 @@ service:
     - collector
     - dataserver
     - resultserver
+    - kernelserver
   ports:
     - "80:5000" # REST API for users
     - "5556:5556"
@@ -37,6 +38,7 @@ workers:
     - redis
     - dataserver
     - resultserver
+    - kernelserver
 
 #workers2:
 #  build: workers/python2
@@ -82,6 +84,13 @@ resultserver:
     - redis
   ports:
     - "3001:3000"
+
+kernelserver:
+  build: file-server
+  links:
+    - redis
+  ports:
+    - "3333:3000"
 
 
 # Frontend to test CI

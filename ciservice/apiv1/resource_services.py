@@ -7,6 +7,9 @@ from flask.ext.restful import Resource
 
 
 class ServicesResource(Resource):
+    """
+    List of available services.
+    """
 
     def __init__(self):
         self.__redis_conn = redis.Redis('redis', 6379)
