@@ -40,11 +40,6 @@ class KernelGeneratorWorker(BaseWorker):
 
         return result
 
-    def post_process(self, result, result_location):
-        # Save kernel file in dedicated file server only for the Kernel
-
-        pass
-
 
 if __name__ == '__main__':
     args = parser.get_args()

@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
 		pkg-config libxml2-dev
 RUN conda update conda && conda install scipy numpy networkx
 RUN pip install Flask flask-restful py2cytoscape python-igraph redis rq pyzmq
-RUN pip install requests hdsubnetfinder
+RUN pip install requests
 
 RUN mkdir /api
 WORKDIR /api

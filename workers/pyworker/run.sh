@@ -2,7 +2,7 @@
 
 # Run workers for 0MQ
 
-new_workers=2
+new_workers=3
 
 kernel_endpoint='kernel'
 subnet_endpoint='subnet'

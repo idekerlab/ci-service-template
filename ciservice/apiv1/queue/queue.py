@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from flask.ext.restful import Resource
-import zmq
 import redis
 
 
 # Port for fetching task status
+from . import TAG_JOB_ID, TAG_STATUS
+
 FETCH_PORT = 5555
 
 # Port for status monitor
 STATUS_PORT = 7777
 
 REDIS_PORT = 6379
-
-TAG_STATUS = 'status'
-TAG_JOB_ID = 'job_id'
 
 
 class TaskQueue(Resource):
