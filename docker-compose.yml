@@ -1,6 +1,8 @@
-# Cytoscape CI sample setup
+#
+# Cytoscape CI template
 # 
-# Rev 2
+# Rev 3: Minimized version.
+#  - All legacy code base removed
 # by Keiichiro Ono
 #
 
@@ -31,7 +33,7 @@ service:
 
 # Python workers sample
 workers:
-  build: workers/pyworker
+  build: workers/python/heat-diffusion
   links:
     - service
     - collector
@@ -39,20 +41,6 @@ workers:
     - dataserver
     - resultserver
     - kernelserver
-
-#workers2:
-#  build: workers/python2
-#  links:
-#    - service
-#    - collector
-#    - dataserver
-
-# Workers with R/Bioconductor
-#rworkers:
-#  build: workers/r
-#  links:
-#    - service
-#    - collector
 
 # Colector /
 collector:

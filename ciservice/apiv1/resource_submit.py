@@ -1,22 +1,19 @@
 import uuid
-import zmq
 import logging
-import redis
 
+from flask.ext.restful import Resource
+import zmq
+import redis
 from flask import request
 import requests as client
 
-from .resource_base import BaseResource
-from .utils.file_util import FileUtil
-
 STATUS_PORT = 6666
-
 INPUT_DATA_SERVER_LOCATION = 'http://dataserver:3000/'
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-class SubmitResource(BaseResource):
+class SubmitResource(Resource):
     """
     Sample API for calling new worker pool
     """
@@ -52,7 +49,8 @@ class SubmitResource(BaseResource):
         """
         logging.debug('Task name: ' + name)
 
-        req = client.post(INPUT_DATA_SERVER_LOCATION + 'data', json=request.stream.read(),
+        req = client.post(INPUT_DATA_SERVER_LOCATION + 'data',
+                          json=request.stream.read(),
                           stream=True)
         logging.debug('File server response Data = ' + str(req.json()))
         file_id = req.json()['fileId']
@@ -71,9 +69,6 @@ class SubmitResource(BaseResource):
 
         # Job created
         return current_status, 202
-
-    def prepare_result(self, data):
-        return FileUtil.create_result(uuid.uuid1().int, data)
 
     def submit_to_worker(self, input_data_location, service_name):
         # Generate unique job ID

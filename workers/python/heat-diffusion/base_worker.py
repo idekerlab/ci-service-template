@@ -59,8 +59,7 @@ class BaseWorker(object):
 
     def listen(self):
         # Start listening...
-        logging.info('Worker start: ID = ' + str(self.id))
-        logging.info('IP = ' + str(self.router))
+        logging.info('Worker: ID = ' + str(self.id) + ', Location = ' + str(self.router))
 
         while True:
             data = self.__receiver.recv_json()

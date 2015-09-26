@@ -1,6 +1,7 @@
 # Cytoscape CI Service Template
 
 ## Status
+* 9/25/2015: Code cleanup started.
 * 5/18/2015: 0.2.1 release.  Directory structure has been optimized.
     * Tests have been updated and checked with PEP8 standards 
 
