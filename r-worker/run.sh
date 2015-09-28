@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #
-# Run script for R workers.
+# Run script for R pyworker.
 #
 
-# Number of workers to be created
+# Number of pyworker to be created
 new_workers=2
 
 # IP Address of the router

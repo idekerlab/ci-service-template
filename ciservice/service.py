@@ -8,7 +8,7 @@ from apiv1.resource_version import VersionResource
 from apiv1.queue.queue import TaskQueue
 from apiv1.resource_upload import UploadResource
 from apiv1.queue.task import Task
-from apiv1.resource_submit import SubmitResource
+from apiv1.resource_service import ServiceResource
 from apiv1.resource_services import ServicesResource
 
 API_VERSION = '/v1'
@@ -24,7 +24,7 @@ api.add_resource(VersionResource, '')
 api.add_resource(ServicesResource, '/services')
 
 # Endpoint to send actual jobs to a service
-api.add_resource(SubmitResource, '/services/<string:name>')
+api.add_resource(ServiceResource, '/services/<string:name>')
 
 # Job list
 api.add_resource(TaskQueue, '/queue')

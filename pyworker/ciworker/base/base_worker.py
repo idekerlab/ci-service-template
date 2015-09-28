@@ -15,15 +15,27 @@ logging.basicConfig(level=logging.DEBUG)
 
 class BaseWorker(object):
     """
-    Minimalistic workers implementation for python
+    Minimal worker implementation for python
     """
-    def __init__(self, endpoint, id, router, collector,
-                 receiver, sender=SEND_PORT, monitor=MONITOR_PORT):
 
-        self.redis_conn = redis.Redis('redis', 6379)
+    def __init__(self,
+                 endpoint,
+                 description,
+                 parameters,
+                 id,
+                 router,
+                 collector,
+                 receiver,
+                 sender=SEND_PORT,
+                 monitor=MONITOR_PORT,
+                 result_server=RESULT_SERVER_LOCATION,
+                 redis_server=REDIS_SERVER_LOCATION):
+
+        self.redis_conn = redis.Redis(redis_server, 6379)
 
         self.id = id
         self.router = router
+        self.result_file_server = result_server
         
         # 0MQ context
         context = zmq.Context()
@@ -31,6 +43,11 @@ class BaseWorker(object):
         registered = self.redis_conn.hgetall('endpoints')
         if endpoint not in registered.keys():
             self.redis_conn.hset('endpoints', endpoint, receiver)
+            self.redis_conn.hset(endpoint, 'description', str(description))
+
+            serialized_params = json.dumps(parameters)
+            self.redis_conn.hset(endpoint, 'parameters', serialized_params)
+
             logging.info('Service registered: ' + endpoint + ', Port ' + str(receiver))
         else:
             logging.debug('No need to register: ' + str(endpoint))
@@ -90,7 +107,7 @@ class BaseWorker(object):
 
             final_result = self.run(data=input_dict)
 
-            req = client.post(RESULT_SERVER_LOCATION + 'data', json=final_result, stream=True)
+            req = client.post(self.result_file_server + 'data', json=final_result, stream=True)
             file_id = req.json()['fileId']
 
             logging.debug('# Result saved to server = ' + str(req.json()))
@@ -98,7 +115,7 @@ class BaseWorker(object):
             result = {
                 'worker_id': str(self.id),
                 'job_id': jid,
-                'result': RESULT_SERVER_LOCATION + 'data/' + str(file_id)
+                'result': self.result_file_server + 'data/' + str(file_id)
             }
 
             # Send results to sink

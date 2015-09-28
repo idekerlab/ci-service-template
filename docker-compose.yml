@@ -31,17 +31,6 @@ service:
     - "8888:8888"
     - "9999:9999" # endpoint registration
 
-# Python workers sample
-workers:
-  build: workers/python/heat-diffusion
-  links:
-    - service
-    - collector
-    - redis
-    - dataserver
-    - resultserver
-    - kernelserver
-
 # Colector /
 collector:
   build: collector
@@ -55,7 +44,6 @@ collector:
     - "6666:6666"
     - "5001:5001" # for Flask
 
-
 # For input data caching
 dataserver:
   build: file-server
@@ -63,7 +51,6 @@ dataserver:
     - redis
   ports:
     - "3000:3000"
-
 
 # For result data caching
 resultserver:
@@ -80,6 +67,28 @@ kernelserver:
   ports:
     - "3333:3000"
 
+
+# Workers
+
+heatdiff:
+  build: pyworker/heat-diffusion
+  links:
+    - service
+    - collector
+    - redis
+    - dataserver
+    - resultserver
+    - kernelserver
+
+hello:
+  build: pyworker/hello
+  links:
+    - service
+    - collector
+    - redis
+    - dataserver
+    - resultserver
+    - kernelserver
 
 # Frontend to test CI
 #notebook:

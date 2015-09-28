@@ -1,5 +1,6 @@
 import uuid
 import logging
+import json
 
 from flask.ext.restful import Resource
 import zmq
@@ -13,14 +14,13 @@ INPUT_DATA_SERVER_LOCATION = 'http://dataserver:3000/'
 logging.basicConfig(level=logging.DEBUG)
 
 
-class SubmitResource(Resource):
+class ServiceResource(Resource):
     """
     Sample API for calling new worker pool
     """
 
     def __init__(self):
-        super(SubmitResource, self).__init__()
-        # Data producer to send tasks to workers.
+        super(ServiceResource, self).__init__()
         self.__context = zmq.Context()
 
         self.__monitor = self.__context.socket(zmq.PUSH)
@@ -29,17 +29,23 @@ class SubmitResource(Resource):
         self.__sockets = {}
         self.__redis_conn = redis.Redis('redis', 6379)
 
-    def get(self):
+    def get(self, name):
         """
-        Simply return description of this service
+        Details of this service
 
-        :return:
+        :return: Details about this service.
         """
-        description = {
-            'message': 'Use POST method to submit your graph data.'
+        desc = self.__redis_conn.hget(name, 'description')
+        params = self.__redis_conn.hget(name, 'parameters')
+        param_object = json.loads(params)
+
+        service_details = {
+            'serviceName': name,
+            'description': desc,
+            'parameters': param_object
         }
 
-        return description, 200
+        return service_details, 200
 
     def post(self, name):
         """

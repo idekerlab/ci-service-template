@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run workers for 0MQ
+# Run pyworker for 0MQ
 new_workers=7
 
 # IP Address of the router

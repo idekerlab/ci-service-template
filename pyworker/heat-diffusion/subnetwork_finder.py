@@ -1,18 +1,37 @@
 import logging
-import arg_parser as parser
 
-from base_worker import BaseWorker
+from base import arg_parser as parser
+from base.base_worker import BaseWorker
 from hdsubnetfinder.subnetwork.sub_network_finder import SubNetworkFinder
 from hdsubnetfinder.kernel.kernel_generator import KernelGenerator
 import hdsubnetfinder.subnetwork.network_util as util
 
 
 class SubnetworkFinderWorker(BaseWorker):
-
-    def __init__(self, endpoint, id, router, collector, receiver):
-        super(SubnetworkFinderWorker, self)\
-            .__init__(endpoint, id, router, collector, receiver)
-
+    def __init__(self, endpoint, id, router, collector,
+                 receiver):
+        description = 'Heat diffusion sub network finder service.'
+        parameters = {
+            "network_url": {
+                "type": "string",
+                "required": True,
+                "description": "URL of the SIF network file for the kernel."
+            },
+            "kernel_url": {
+                "type": "string",
+                "required": True,
+                "description": "URL of the pre-computed kernel file."
+            },
+            "query": {
+                "type": "array",
+                "required": True,
+                "description": "Array of gene names to be used for "
+                               "sub network search."
+            }
+        }
+        super(SubnetworkFinderWorker, self).__init__(endpoint, description,
+                                                     parameters, id, router,
+                                                     collector, receiver)
         self.__finders = {}
 
     def run(self, data):

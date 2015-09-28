@@ -13,7 +13,7 @@ SEND_PORT = 5558
 
 class Worker(object):
     """
-    Minimalistic workers implementation for python
+    Minimalistic pyworker implementation for python
     """
     def __init__(self, id, router, collector, receiver=REC_PORT, sender=SEND_PORT):
         self.__id = 'External: ' + str(id)
@@ -83,7 +83,7 @@ class Worker(object):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Start workers.')
+    parser = argparse.ArgumentParser(description='Start pyworker.')
 
     parser.add_argument('id', type=int, help='worker ID.')
     parser.add_argument('router', type=str, help='router IP address.')

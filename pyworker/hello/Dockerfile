@@ -1,15 +1,11 @@
-# Docker file for Python workers.
-# 
-# Designed to run heavy number crunching
-#
+# Docker file for simple Python workers
 
-FROM continuumio/miniconda
+FROM python:3.5
 
 MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 
 RUN apt-get update && apt-get install -y build-essential
-RUN conda update conda && conda install scipy numpy
-RUN pip install hdsubnetfinder redis pyzmq
+RUN pip install redis pyzmq requests ciworker==0.1.3
 
 RUN mkdir /workers
 WORKDIR /workers

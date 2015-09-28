@@ -3,7 +3,7 @@ import argparse
 
 def get_args():
 
-    parser = argparse.ArgumentParser(description='Start workers.')
+    parser = argparse.ArgumentParser(description='Start pyworker.')
 
     parser.add_argument('endpoint', type=str, help='Endpoint name.')
     parser.add_argument('id', type=int, help='worker ID.')
@@ -12,5 +12,3 @@ def get_args():
     parser.add_argument('port', type=int, help='port number of the router.')
 
     return parser.parse_args()
-
-
