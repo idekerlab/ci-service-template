@@ -45,8 +45,14 @@ class Task(Resource):
         result_location = self.__redis_connection.hget(name='results', key=job_id)
         logging.debug('Deleting result file: ' + str(result_location))
 
+        input_cache_location = self.__redis_connection.hget(name='input-file',
+                                                      key=job_id)
         # Result file
         req = requests.delete(result_location)
+        logging.debug(str(req.json()))
+
+        # Input file
+        req = requests.delete(input_cache_location)
         logging.debug(str(req.json()))
 
         # Delete from status list

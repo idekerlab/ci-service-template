@@ -49,19 +49,29 @@ class ServiceResource(Resource):
 
     def post(self, name):
         """
-        POST network data to queue
+        POST a new job to a service
 
         :return:
         """
-        logging.debug('Task name: ' + name)
+        logging.debug('Service name: ' + name)
 
+        # Stream the input data to file server (data cache server).
         req = client.post(INPUT_DATA_SERVER_LOCATION + 'data',
                           json=request.stream.read(),
                           stream=True)
+
         logging.debug('File server response Data = ' + str(req.json()))
+
+        # This is a unique file ID for this input data
         file_id = req.json()['fileId']
 
+        # ID of this new job
         job_id = self.submit_to_worker(file_id, name)
+
+        # Save the key-value pair (Job ID to input file ID)
+        #    - This will be used for deletion.
+        input_file_location = INPUT_DATA_SERVER_LOCATION + 'data/' + file_id
+        self.__redis_conn.hset(name='input-file', key=job_id, value=input_file_location)
 
         current_status = {
             'job_id': job_id,
