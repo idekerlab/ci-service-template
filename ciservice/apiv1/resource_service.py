@@ -1,12 +1,12 @@
 import uuid
 import logging
-import json
 
 from flask.ext.restful import Resource
 import zmq
 import redis
 from flask import request
 import requests as client
+from util_service import ServiceUtil
 
 STATUS_PORT = 6666
 INPUT_DATA_SERVER_LOCATION = 'http://dataserver:3000/'
@@ -28,6 +28,7 @@ class ServiceResource(Resource):
 
         self.__sockets = {}
         self.__redis_conn = redis.Redis('redis', 6379)
+        self.__util = ServiceUtil()
 
     def get(self, name):
         """
@@ -35,17 +36,7 @@ class ServiceResource(Resource):
 
         :return: Details about this service.
         """
-        desc = self.__redis_conn.hget(name, 'description')
-        params = self.__redis_conn.hget(name, 'parameters')
-        param_object = json.loads(params)
-
-        service_details = {
-            'serviceName': name,
-            'description': desc,
-            'parameters': param_object
-        }
-
-        return service_details, 200
+        return self.__util.get_service_details(name), 200
 
     def post(self, name):
         """
