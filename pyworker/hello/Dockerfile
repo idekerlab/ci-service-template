@@ -5,7 +5,7 @@ FROM python:3.5
 MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 
 RUN apt-get update && apt-get install -y build-essential
-RUN pip install redis pyzmq requests ciworker==0.1.3
+RUN pip install redis pyzmq requests ciworker==0.1.4
 
 RUN mkdir /workers
 WORKDIR /workers

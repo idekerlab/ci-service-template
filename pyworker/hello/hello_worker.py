@@ -1,6 +1,6 @@
 import time
-from base.base_worker import BaseWorker
-from base import arg_parser as parser
+from ciworker.base_worker import BaseWorker
+from ciworker import arg_parser as parser
 
 
 class HelloWorker(BaseWorker):

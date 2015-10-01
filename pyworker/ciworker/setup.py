@@ -4,12 +4,12 @@ from setuptools import setup, find_packages
 
 setup(
     name='ciworker',
-    version='0.1.3',
-    description='Cytoscape CI base service template',
+    version='0.1.4',
+    description='Cytoscape CI ciworker service template',
     long_description='Template worker code for Cytoscape CI.',
     author='Keiichiro Ono',
     author_email='kono@ucsd.edu',
-    url='https://github.com/idekerlab',
+    url='https://github.com/idekerlab/ci-service-template',
     license='MIT License',
     keywords=['graph', 'network', 'cytoscape'],
     install_requires=[

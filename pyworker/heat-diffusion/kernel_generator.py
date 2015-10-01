@@ -2,8 +2,8 @@
 import logging
 import uuid
 import requests as client
-from base import arg_parser as parser
-from base.base_worker import BaseWorker
+from ciworker import arg_parser as parser
+from ciworker.base_worker import BaseWorker
 
 from hdsubnetfinder.kernel.kernel_generator import KernelGenerator
 import hdsubnetfinder.kernel.kernel_util as util

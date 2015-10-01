@@ -9,7 +9,7 @@ MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 
 RUN apt-get update && apt-get install -y build-essential
 RUN conda update conda && conda install scipy numpy
-RUN pip install hdsubnetfinder redis pyzmq ciworker==0.1.3
+RUN pip install hdsubnetfinder redis pyzmq ciworker==0.1.4
 
 RUN mkdir /workers
 WORKDIR /workers
