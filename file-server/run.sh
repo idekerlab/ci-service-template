@@ -1,3 +1,3 @@
 #!/bin/bash
 
-node ./server.js
+forever ./server.js

@@ -33,5 +33,3 @@ class TaskResult(Resource):
         logging.debug('TIME: ' + str(end-start))
 
         return Response(req.content, mimetype='application/json')
-
-

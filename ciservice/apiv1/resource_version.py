@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-
 from flask.ext.restful import Resource
 from flask import request
 

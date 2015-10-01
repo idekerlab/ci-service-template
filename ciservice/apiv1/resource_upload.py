@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
 import requests as rqc
-import uuid
-
 from flask.ext.restful import Resource
 from flask import Response, request
 from flask import stream_with_context

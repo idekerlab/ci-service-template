@@ -14,8 +14,10 @@ aws_secret=$(grep $SECRET ~/.aws/credentials | cut -d "=" -f 2 | tr -d '[[:space
 # Defaults
 AWS_VPC="vpc-194d467b"
 AWS_SECURITY_GROUP="ci-http"
-AWS_PRICE="0.03"
-AWS_INSTANCE_TYPE="m4.xlarge"
+
+aws_price="0.03"
+aws_instance_type="m4.xlarge"
+
 
 
 help() {
@@ -61,12 +63,11 @@ elif [ "$2" == "aws" ]; then
         --amazonec2-vpc-id $AWS_VPC \
         --amazonec2-region us-west-2 \
         --amazonec2-zone b \
-        --amazonec2-root-size 10 \
+        --amazonec2-root-size 30 \
         --amazonec2-security-group $AWS_SECURITY_GROUP \
         --amazonec2-spot-price $aws_price --amazonec2-instance-type $aws_instance_type $1
         #--amazonec2-ami: The AMI ID of the instance to use Default: ami-4ae27e22
         #--amazonec2-iam-instance-profile: The AWS IAM role name to be used as the inst ance profile
-        #--amazonec2-root-size: The root disk size of the instance (in GB). Default: 16
         #--amazonec2-session-token: Your session token for the Amazon Web Services API.
         #--amazonec2-subnet-id: AWS VPC subnet id
 else
