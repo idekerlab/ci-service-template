@@ -3,7 +3,7 @@ import argparse
 
 def get_args():
 
-    parser = argparse.ArgumentParser(description='Start pyworker.')
+    parser = argparse.ArgumentParser(description='Start python-worker.')
 
     parser.add_argument('endpoint', type=str, help='Endpoint name.')
     parser.add_argument('id', type=int, help='worker ID.')

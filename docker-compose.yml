@@ -71,7 +71,7 @@ kernelserver:
 # Workers
 
 heatdiff:
-  build: pyworker/heat-diffusion
+  build: workers/python-worker/heat-diffusion
   links:
     - service
     - collector
@@ -81,7 +81,7 @@ heatdiff:
     - kernelserver
 
 hello:
-  build: pyworker/hello
+  build: workers/python-worker/hello
   links:
     - service
     - collector
