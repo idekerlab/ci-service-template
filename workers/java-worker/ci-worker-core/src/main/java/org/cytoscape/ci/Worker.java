@@ -1,5 +1,15 @@
 package org.cytoscape.ci;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.naming.InitialContext;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -7,30 +17,107 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.zeromq.ZMQ;
 
+import redis.clients.jedis.Jedis;
+
 public class Worker {
 
-	private final ZMQ.Context context;
+	private final Logger logger = Logger.getLogger("worker");
 	
-	private final ZMQ.Socket queue;
-	private final ZMQ.Socket collector;
-	private final ZMQ.Socket monitor;
+	private static final String REDIS_ENDPOINTS = "endpoints";
+	private static final String REDIS_DESCRIPTION = "description";
 
-	public Worker(final String serverIP, final Integer recieverPort,
+	private ZMQ.Context context;
+	private ZMQ.Socket queue;
+	private ZMQ.Socket collector;
+	private ZMQ.Socket monitor;
+
+	// Redis Client for Java
+	private Jedis redisClient;
+
+	// Url of the server
+	private final URL resultFileServer;
+
+	private final String endpoint;
+	private final String description;
+	private final String id;
+	private final Collection<ServiceParameter> parameters;
+
+	public Worker(final String endpoint, final String description,
+			final Collection<ServiceParameter> parameters, final String id,
+
+			final String resultFileServerUrl,
+
+			final String redisServerIp, final Integer redisServerPort,
+
+			final String serverIP, final Integer recieverPort,
 			final Integer senderPort, final Integer monitorPort) {
+
+		logger.setLevel(Level.INFO);
 		
-		context = ZMQ.context(1);
+		// Set basic parameters
 
-		// Socket to receive messages on
-		queue = context.socket(ZMQ.PULL);
-		queue.connect("tcp://" + serverIP + ":" + recieverPort.toString());
+		if (endpoint == null || endpoint.isEmpty()) {
+			throw new IllegalArgumentException(
+					"Endpoint parameter should ne non-empty string.");
+		} else {
+			this.endpoint = endpoint;
+		}
 
-		// Socket to send messages to
-		collector = context.socket(ZMQ.PUSH);
-		collector.connect("tcp://" + serverIP + ":" + senderPort.toString());
+		this.id = id;
+		this.description = description;
+		this.parameters = parameters;
 
-		// Socket to send messages to
-		monitor = context.socket(ZMQ.PUSH);
-		monitor.connect("tcp://" + serverIP + ":" + monitorPort.toString());
+		// Setup server URLs
+		try {
+			this.resultFileServer = new URL(resultFileServerUrl);
+		} catch (MalformedURLException e) {
+			throw new IllegalArgumentException(
+					"Invalid URL for the result file server.");
+		}
+
+		// Create Redis Client
+		this.redisClient = new Jedis(redisServerIp, redisServerPort);
+
+		this.initZmqConnections(serverIP, monitorPort, serverIP, monitorPort,
+				serverIP, monitorPort);
+	}
+
+	private final void initZmqConnections(
+			final String taskQueueIp, final Integer taskQueuePort,
+			final String collectorIp, final Integer collectorPort,
+			final String monitorIp, final Integer monitorPort) {
+		
+		final Map<String, String> registeredEndpoints = this.redisClient.hgetAll(REDIS_ENDPOINTS);
+		
+		if(registeredEndpoints.keySet().contains(this.endpoint)) {
+			redisClient.hset(REDIS_ENDPOINTS, this.endpoint, taskQueuePort.toString());
+			redisClient.hset(this.endpoint, REDIS_DESCRIPTION, this.description);
+			
+			// TODO Serialze parameter object into JSON using Jackson Databind.
+			//serializedParams = json.dumps(parameters);
+			//self.redis_conn.hset(endpoint, "parameters", serialized_params)
+
+			logger.info("Service registered: " + endpoint + ", Port " + taskQueuePort);
+		} else {
+			logger.info("No need to register: " + this.endpoint);
+		}
+		
+		// ZeroMQ settings
+		
+		this.context = ZMQ.context(1);
+
+		// Socket to connect to task queue
+		this.queue = context.socket(ZMQ.PULL);
+		this.queue.connect("tcp://" + taskQueueIp + ":" + taskQueuePort.toString());
+
+		// Socket to push result to collector
+		this.collector = context.socket(ZMQ.PUSH);
+		this.collector.connect("tcp://" + collectorIp + ":" + collectorPort.toString());
+
+		// Socket to send messages to monitor
+		this.monitor = context.socket(ZMQ.PUSH);
+		this.monitor.connect("tcp://" + monitorIp + ":" + monitorPort.toString());
+		
 	}
 
 	public void listen() {
@@ -38,7 +125,6 @@ public class Worker {
 
 		while (!Thread.currentThread().isInterrupted()) {
 			String string = new String(queue.recv(0)).trim();
-			long msec = Long.parseLong(string);
 			// Simple progress indicator for the viewer
 			System.out.flush();
 			System.out.print(string + '.');
@@ -76,11 +162,11 @@ public class Worker {
 			final String collectorPort = line.getOptionValue("c");
 			final String monitorPort = line.getOptionValue("m");
 
-			worker = new Worker(serverIpAddress, Integer.parseInt(queuePort),
-					Integer.parseInt(collectorPort),
-					Integer.parseInt(monitorPort));
+//			worker = new Worker(serverIpAddress, Integer.parseInt(queuePort),
+//					Integer.parseInt(collectorPort),
+//					Integer.parseInt(monitorPort));
 
-			worker.listen();
+//			worker.listen();
 
 		} catch (ParseException exp) {
 			System.out.println("Unexpected exception:" + exp.getMessage());
