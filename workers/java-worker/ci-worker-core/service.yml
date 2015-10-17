@@ -1,0 +1,15 @@
+# Sample worker definition
+
+worker1:
+  id: A
+  description: "Sample worker"
+  parameters:
+  	param1:
+  		type: string
+  servers:
+  	queue:
+    - "80:80"
+  links:
+    - mysql
+  volumes_from:
+    - data

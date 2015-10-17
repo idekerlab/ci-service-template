@@ -1,14 +1,12 @@
 package org.cytoscape.ci;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.naming.InitialContext;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -18,6 +16,8 @@ import org.apache.commons.cli.ParseException;
 import org.zeromq.ZMQ;
 
 import redis.clients.jedis.Jedis;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Worker {
 
@@ -42,15 +42,39 @@ public class Worker {
 	private final String id;
 	private final Collection<ServiceParameter> parameters;
 
-	public Worker(final String endpoint, final String description,
-			final Collection<ServiceParameter> parameters, final String id,
+	/**
+	 * Base Java Worker class
+	 * 
+	 * @param endpoint Endpoint of the service.
+	 * @param description Description of the service
+	 * @param parameters
+	 * @param id Worker ID
+	 * @param resultFileServerUrl
+	 * @param redisServerIp
+	 * @param redisServerPort
+	 * @param serverIP
+	 * @param recieverPort
+	 * @param senderPort
+	 * @param monitorPort
+	 */
+	public Worker(
+			final String endpoint,
+			final String description,
+
+			final Collection<ServiceParameter> parameters,
+
+			final String id,
 
 			final String resultFileServerUrl,
 
-			final String redisServerIp, final Integer redisServerPort,
+			final String redisServerIp,
+			final Integer redisServerPort,
 
-			final String serverIP, final Integer recieverPort,
-			final Integer senderPort, final Integer monitorPort) {
+			final String serverIP,
+			final Integer recieverPort,
+			final Integer senderPort,
+			final Integer monitorPort
+		) {
 
 		logger.setLevel(Level.INFO);
 		
@@ -120,17 +144,23 @@ public class Worker {
 		
 	}
 
-	public void listen() {
+	public void listen() throws IOException {
 		System.out.println("Java Worker: listening...");
 
 		while (!Thread.currentThread().isInterrupted()) {
-			String string = new String(queue.recv(0)).trim();
-			// Simple progress indicator for the viewer
-			System.out.flush();
-			System.out.print(string + '.');
+			// Get input data as raw String
+			final String dataString = new String(queue.recv(0)).trim();
 
-			// Send results to sink
-			collector.send("".getBytes(), 0);
+			// Use Jackson Object Mapper to create pojo from JSON string
+			final ObjectMapper mapper = new ObjectMapper();
+			final InputData inputData = mapper.readValue(dataString, InputData.class);
+			
+			// Create status message JSON
+			final JobStatus status = new JobStatus(inputData.job_id, id, "running");
+			monitor.send(mapper.writeValueAsString(status));
+			
+			logger.info("Data location => " + inputData.data);
+
 		}
 
 		collector.close();
@@ -139,9 +169,17 @@ public class Worker {
 	}
 
 	public static void main(String[] args) {
+		
+		// Parse command-line options and 
 		CommandLineParser parser = new DefaultParser();
 		Options options = new Options();
-		options.addOption("i", "server-ip", true, "Server IP Address");
+		
+		options.addOption("e", "endpoint", true, "Endpoint");
+		options.addOption("d", "description", true, "Description of the service");
+		options.addOption("i", "id", true, "Unique ID of the worker");
+		
+		options.addOption("s", "result-server", true, "Result file server IP Address");
+		options.addOption("r", "redis", true, "Redis IP address");
 
 		options.addOption("q", "queue-port", true, "Task queue port number");
 		options.addOption("c", "collector-port", true, "Collector port number");
@@ -155,20 +193,37 @@ public class Worker {
 
 			String serverIpAddress = "localhost";
 
-			if (line.hasOption("i")) {
-				serverIpAddress = line.getOptionValue("i");
+			if (line.hasOption("s")) {
+				serverIpAddress = line.getOptionValue("s");
 			}
+			final String endpoint = line.getOptionValue("e");
+			final String description = line.getOptionValue("d");
+			final String id = line.getOptionValue("i");
+			
 			final String queuePort = line.getOptionValue("q");
 			final String collectorPort = line.getOptionValue("c");
 			final String monitorPort = line.getOptionValue("m");
 
-//			worker = new Worker(serverIpAddress, Integer.parseInt(queuePort),
-//					Integer.parseInt(collectorPort),
-//					Integer.parseInt(monitorPort));
+			worker = new Worker(
+					endpoint,
+					description,
+					null,
+					id,
+					
+					resultFileServerUrl,
 
-//			worker.listen();
+					redisServerIp,
+					InredisServerPort,
 
-		} catch (ParseException exp) {
+	
+					Integer.parseInt(queuePort),
+					Integer.parseInt(collectorPort),
+					Integer.parseInt(monitorPort));
+
+			worker.listen();
+
+		} catch (Exception exp) {
+			exp.printStackTrace();
 			System.out.println("Unexpected exception:" + exp.getMessage());
 		}
 	}

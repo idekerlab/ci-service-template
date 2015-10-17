@@ -1,4 +1,5 @@
 #!/bin/bash
+
 PATH=/usr/lib/jvm/java-8-openjdk-amd64/bin:$PATH
 
 java -version
