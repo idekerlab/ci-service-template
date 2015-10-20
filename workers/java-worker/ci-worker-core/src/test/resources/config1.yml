@@ -1,0 +1,73 @@
+#
+# Prototype configuration file for CI Service Workers
+#
+# Rev. 0.0.2
+#
+# by Keiichiro Ono (kono at ucsd edu.)
+#
+
+#
+# Sample Service Definition 1: Scale-Free network generator
+#
+scalefree:
+  endpoint: scale-free
+  description: Sample Java worker for generating random graph
+  instances: 3
+  servers:
+    task_queue:
+      location: router
+      port: 5560
+    collector:
+      - location: collector
+        port: 8866
+    monitor:
+      - location: collector
+        port: 8866
+    redis:
+      - location: redis
+        port: 6379
+    result:
+      - location: localhost
+        port: 3000
+    datacache:
+      - location: localhost
+        port: 3001
+  parameters:
+    - name: number_of_nodes
+      type: number
+      description: "Number of nodes in the network"
+      required: true
+
+layout1:
+  endpoint: layout1
+  description: "Sample Java worker for automatic graph layout"
+  instances: 2
+  servers:
+    task_queue:
+      - location: router
+        port: 5560
+    collector:
+      - location: collector
+        port: 8866
+    monitor:
+      - location: collector
+        port: 8866
+    redis:
+      - location: redis
+        port: 6379
+    result:
+      - location: localhost
+        port: 3000
+    datacache:
+      - location: localhost
+        port: 3001
+  parameters:
+    - name: spring_constant
+      type: number
+      description: Tension parameter between nodes"
+      required: true
+    - name: mass
+      type: number
+      description: Mass of the node
+      required: true
+

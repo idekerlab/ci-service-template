@@ -17,93 +17,47 @@ import org.zeromq.ZMQ;
 
 import redis.clients.jedis.Jedis;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Worker {
 
-	private final Logger logger = Logger.getLogger("worker");
+	private static final Logger logger = Logger.getLogger("worker");
 	
-	private static final String REDIS_ENDPOINTS = "endpoints";
-	private static final String REDIS_DESCRIPTION = "description";
-
+	@JsonIgnore
 	private ZMQ.Context context;
+	@JsonIgnore
 	private ZMQ.Socket queue;
+	@JsonIgnore
 	private ZMQ.Socket collector;
+	@JsonIgnore
 	private ZMQ.Socket monitor;
 
 	// Redis Client for Java
+	@JsonIgnore
 	private Jedis redisClient;
+	
+	@JsonIgnore
+	private String id;
 
-	// Url of the server
-	private final URL resultFileServer;
-
-	private final String endpoint;
-	private final String description;
-	private final String id;
-	private final Collection<ServiceParameter> parameters;
-
-	/**
-	 * Base Java Worker class
-	 * 
-	 * @param endpoint Endpoint of the service.
-	 * @param description Description of the service
-	 * @param parameters
-	 * @param id Worker ID
-	 * @param resultFileServerUrl
-	 * @param redisServerIp
-	 * @param redisServerPort
-	 * @param serverIP
-	 * @param recieverPort
-	 * @param senderPort
-	 * @param monitorPort
-	 */
-	public Worker(
-			final String endpoint,
-			final String description,
-
-			final Collection<ServiceParameter> parameters,
-
-			final String id,
-
-			final String resultFileServerUrl,
-
-			final String redisServerIp,
-			final Integer redisServerPort,
-
-			final String serverIP,
-			final Integer recieverPort,
-			final Integer senderPort,
-			final Integer monitorPort
-		) {
+	// The following will be set by Jackson Data Mapper
+	
+	public String endpoint;
+	public String description;
+	public Integer instances;
+	
+	public Collection<Map> servers;
+	public Collection<Map<String, Object>> parameters;
+	
+	public Worker() {
 
 		logger.setLevel(Level.INFO);
 		
-		// Set basic parameters
-
-		if (endpoint == null || endpoint.isEmpty()) {
-			throw new IllegalArgumentException(
-					"Endpoint parameter should ne non-empty string.");
-		} else {
-			this.endpoint = endpoint;
-		}
-
-		this.id = id;
-		this.description = description;
-		this.parameters = parameters;
-
-		// Setup server URLs
-		try {
-			this.resultFileServer = new URL(resultFileServerUrl);
-		} catch (MalformedURLException e) {
-			throw new IllegalArgumentException(
-					"Invalid URL for the result file server.");
-		}
-
 		// Create Redis Client
-		this.redisClient = new Jedis(redisServerIp, redisServerPort);
-
-		this.initZmqConnections(serverIP, monitorPort, serverIP, monitorPort,
-				serverIP, monitorPort);
+//		this.redisClient = new Jedis(redisServerIp, redisServerPort);
+//
+//		this.initZmqConnections(serverIP, monitorPort, serverIP, monitorPort,
+//				serverIP, monitorPort);
 	}
 
 	private final void initZmqConnections(
@@ -111,20 +65,20 @@ public class Worker {
 			final String collectorIp, final Integer collectorPort,
 			final String monitorIp, final Integer monitorPort) {
 		
-		final Map<String, String> registeredEndpoints = this.redisClient.hgetAll(REDIS_ENDPOINTS);
+//		final Map<String, String> registeredEndpoints = this.redisClient.hgetAll(REDIS_ENDPOINTS);
 		
-		if(registeredEndpoints.keySet().contains(this.endpoint)) {
-			redisClient.hset(REDIS_ENDPOINTS, this.endpoint, taskQueuePort.toString());
-			redisClient.hset(this.endpoint, REDIS_DESCRIPTION, this.description);
+//		if(registeredEndpoints.keySet().contains(this.endpoint)) {
+//			redisClient.hset(REDIS_ENDPOINTS, this.endpoint, taskQueuePort.toString());
+//			redisClient.hset(this.endpoint, REDIS_DESCRIPTION, this.description);
 			
 			// TODO Serialze parameter object into JSON using Jackson Databind.
 			//serializedParams = json.dumps(parameters);
 			//self.redis_conn.hset(endpoint, "parameters", serialized_params)
-
-			logger.info("Service registered: " + endpoint + ", Port " + taskQueuePort);
-		} else {
-			logger.info("No need to register: " + this.endpoint);
-		}
+//
+//			logger.info("Service registered: " + endpoint + ", Port " + taskQueuePort);
+//		} else {
+//			logger.info("No need to register: " + this.endpoint);
+//		}
 		
 		// ZeroMQ settings
 		
@@ -204,21 +158,21 @@ public class Worker {
 			final String collectorPort = line.getOptionValue("c");
 			final String monitorPort = line.getOptionValue("m");
 
-			worker = new Worker(
-					endpoint,
-					description,
-					null,
-					id,
-					
-					resultFileServerUrl,
-
-					redisServerIp,
-					InredisServerPort,
-
-	
-					Integer.parseInt(queuePort),
-					Integer.parseInt(collectorPort),
-					Integer.parseInt(monitorPort));
+//			worker = new Worker(
+//					endpoint,
+//					description,
+//					null,
+//					id,
+//					
+//					resultFileServerUrl,
+//
+//					redisServerIp,
+//					InredisServerPort,
+//
+//	
+//					Integer.parseInt(queuePort),
+//					Integer.parseInt(collectorPort),
+//					Integer.parseInt(monitorPort));
 
 			worker.listen();
 
