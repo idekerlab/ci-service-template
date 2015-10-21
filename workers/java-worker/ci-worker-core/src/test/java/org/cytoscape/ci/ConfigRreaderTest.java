@@ -1,7 +1,10 @@
 package org.cytoscape.ci;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 
 import org.cytoscape.ci.config.WorkerConfiguration;
@@ -24,16 +27,12 @@ public class ConfigRreaderTest {
 
 	@Test
 	public void testRead() throws Exception {
-		ConfigReader reader = new ConfigReader();
+		final ConfigReader reader = new ConfigReader();
 		
-		Map<String, Worker> result = reader.read(getURI("config1.yml").toURL());
-		System.out.println(result.keySet());
-		
-		Object worker = result.get("scalefree");
-		System.out.println(result.keySet());
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-		System.out.println(worker.toString());
-		
+		final Collection<Worker> workers = reader.read(getURI("config1.yml").toURL());
+		int workerCount = workers.size();
+		System.out.println(workerCount);
+		assertEquals(5, workerCount);
 	}
 	
 	private final URI getURI(final String fileName) throws Exception {

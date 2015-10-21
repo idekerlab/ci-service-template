@@ -18,20 +18,20 @@ scalefree:
       location: router
       port: 5560
     collector:
-      - location: collector
-        port: 8866
+      location: collector
+      port: 8866
     monitor:
-      - location: collector
-        port: 8866
+      location: collector
+      port: 8866
     redis:
-      - location: redis
-        port: 6379
+      location: localhost
+      port: 6379
     result:
-      - location: localhost
-        port: 3000
+      location: localhost
+      port: 3000
     datacache:
-      - location: localhost
-        port: 3001
+      location: localhost
+      port: 3001
   parameters:
     - name: number_of_nodes
       type: number
@@ -44,23 +44,23 @@ layout1:
   instances: 2
   servers:
     task_queue:
-      - location: router
-        port: 5560
+      location: router
+      port: 5560
     collector:
-      - location: collector
-        port: 8866
+      location: collector
+      port: 8866
     monitor:
-      - location: collector
-        port: 8866
+      location: collector
+      port: 8866
     redis:
-      - location: redis
-        port: 6379
+      location: redis
+      port: 6379
     result:
-      - location: localhost
-        port: 3000
+      location: localhost
+      port: 3000
     datacache:
-      - location: localhost
-        port: 3001
+      location: localhost
+      port: 3001
   parameters:
     - name: spring_constant
       type: number

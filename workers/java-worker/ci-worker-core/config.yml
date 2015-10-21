@@ -1,0 +1,30 @@
+# Sample worker definition: layout
+
+scalefree:
+  endpoint: scale-free
+  description: Sample Java worker for generating random graph
+  instances: 3
+  servers:
+    task_queue:
+      location: router
+      port: 5560
+    collector:
+      location: collector
+      port: 5558
+    monitor:
+      location: collector
+      port: 6666
+    redis:
+      location: redis
+      port: 6379
+    result:
+      location: resultserver
+      port: 3000
+    datacache:
+      location: dataserver
+      port: 3000
+  parameters:
+    - name: number_of_nodes
+      type: number
+      description: "Number of nodes in the network"
+      required: true
