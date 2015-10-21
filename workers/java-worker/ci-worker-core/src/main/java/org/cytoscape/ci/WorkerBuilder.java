@@ -1,7 +1,10 @@
 package org.cytoscape.ci;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -53,12 +56,26 @@ public class WorkerBuilder {
 			worker.description = "";
 		}
 		
+		// Init parameters
+		Collection<Map<String, ?>> parameters = (Collection<Map<String, ?>>) params.get(PARAMETERS);
+		
+		final List<ServiceParameter> configParam = parameters.stream()
+			.map(param->setParameters(worker, param))
+			.collect(Collectors.toList());
+		
+		System.out.println("@@@@ Params");
+		System.out.println(configParam.size());
+		
+		worker.parameters = configParam;
+		
 		Object servers = params.get(SERVERS);
 		if(servers == null) {
 			throw new NullPointerException("Servers parameter is required.");
 		}
 
 		setServers(worker, (Map<String, ?>) servers);
+		
+		
 		return worker; 
 	}
 	
@@ -86,14 +103,16 @@ public class WorkerBuilder {
 				collectorIp, collectorPort,
 				monitorIp, monitorPort);
 		
+		
 		// Data cache and result file servers
 		final Map<String, ?> result = (Map<String, ?>) serverParams.get(RESULT);
 		final Map<String, ?> dataCache = (Map<String, ?>) serverParams.get(DATA_CACHE);
 		
 	}
 	
-	private final void setServerDetails(final Worker worker, Map<String, ?> details) {
-		
+	private final ServiceParameter setParameters(final Worker worker, Map<String, ?> param) {
+		return new ServiceParameter(param.get(NAME).toString(), param.get(TYPE).toString(), 
+				param.get(DESCRIPTION).toString(), Boolean.parseBoolean(param.get(REQUIRED).toString()));
 	}
 
 }

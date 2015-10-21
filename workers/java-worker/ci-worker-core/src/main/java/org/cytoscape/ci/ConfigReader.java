@@ -8,6 +8,9 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
@@ -44,10 +47,6 @@ public class ConfigReader {
 	}
 	
 	private final Collection<Worker> buildWorkers(Object workerConfig) {
-
-		System.out.println(workerConfig.getClass());
-		System.out.println(workerConfig);
-		
 		if(workerConfig instanceof LinkedHashMap == false) {
 			throw new IllegalArgumentException("Worker Configuration is not LinkedHashMap.");
 		}
@@ -66,6 +65,23 @@ public class ConfigReader {
 			}
 		}
 		return workers;
+	}
+	
+	public static class ExecUtil {
+		public static void stop(ExecutorService executor) {
+			try {
+				executor.shutdown();
+				executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.err.println("termination interrupted");
+			} finally {
+				if (!executor.isTerminated()) {
+					System.err.println("killing non-finished tasks");
+				}
+				executor.shutdownNow();
+			}
+		}
 	}
 
 	public static void main(String[] args) {
@@ -86,11 +102,23 @@ public class ConfigReader {
 			final File f = new File(configFileLocation);
 			final Collection<Worker> workers = reader.read(f.toURI().toURL());
 			
-//			worker.listen();
+			final ExecutorService executor = Executors.newWorkStealingPool();
+			
+			workers.stream()
+					.forEach(
+							worker->executor.submit(new ListenTask(worker))
+							);
 
+			ExecUtil.stop(executor);
+			
+			
 		} catch (Exception exp) {
 			exp.printStackTrace();
 			System.out.println("Unexpected exception:" + exp.getMessage());
 		}
 	}
+	
+	
+	
+	
 }

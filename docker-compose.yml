@@ -1,12 +1,14 @@
 #
 # Cytoscape CI template
 # 
-# Rev 3: Minimized version.
-#  - All legacy code ciworker removed
+# Rev 4: Multiple language support
+#
+#  - Java and Python workers are available
+#
 # by Keiichiro Ono
 #
 
-# Redis server: for job management
+# Redis server: for job and endpoint management
 redis:
   image: redis
   ports:
@@ -67,7 +69,6 @@ kernelserver:
   ports:
     - "3333:3000"
 
-
 # Workers
 
 heatdiff:
@@ -89,6 +90,16 @@ hello:
     - dataserver
     - resultserver
     - kernelserver
+
+# Sample Java worker
+java:
+  build: workers/java-worker/ci-worker-core
+  links:
+    - service
+    - collector
+    - redis
+    - dataserver
+    - resultserver
 
 # Frontend to test CI
 #notebook:

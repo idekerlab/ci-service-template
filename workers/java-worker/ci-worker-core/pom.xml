@@ -49,7 +49,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>org.cytoscape.ci.Worker</mainClass>
+							<mainClass>org.cytoscape.ci.ConfigReader</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

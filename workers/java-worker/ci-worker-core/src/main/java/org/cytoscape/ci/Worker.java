@@ -1,23 +1,14 @@
 package org.cytoscape.ci;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.zeromq.ZMQ;
 
 import redis.clients.jedis.Jedis;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,15 +25,19 @@ public class Worker {
 	private ZMQ.Socket collector;
 	private ZMQ.Socket monitor;
 
-	private String id;
+	final String id;
 
 	// The following will be set by Jackson Data Mapper
 	public String endpoint;
 	public String description;
 	public Integer instances;
 	
-	public ServiceParameter parameters;
+	public Collection<ServiceParameter> parameters;
 	
+	
+	public Worker() {
+		this.id = IdGenerator.getID().toString();
+	}
 
 	protected final void initZmqConnections(
 			final String redisIp, final Integer redisPort,
@@ -54,7 +49,10 @@ public class Worker {
 		final Jedis redisClient = new Jedis(redisIp, redisPort);
 		final Map<String, String> registeredEndpoints = redisClient.hgetAll(REDIS_TAG_ENDPOINTS);
 		
-		if(registeredEndpoints.keySet().contains(this.endpoint)) {
+		logger.info("!Registered endpoints: " + registeredEndpoints.keySet());
+		
+		if(registeredEndpoints.keySet().contains(this.endpoint) == false) {
+			logger.info("## Registering service: " + endpoint + ", Port " + taskQueuePort);
 			
 			redisClient.hset(REDIS_TAG_ENDPOINTS, this.endpoint, taskQueuePort.toString());
 			redisClient.hset(this.endpoint, REDIS_TAG_DESCRIPTION, this.description);
@@ -62,6 +60,8 @@ public class Worker {
 			final ObjectMapper mapper = new ObjectMapper();
 			
 			final String serializedParams = mapper.writeValueAsString(parameters);
+			logger.info("$$$$$$$$$$$$$$$$$$$$$$Serialized params: " + serializedParams);
+			
 			redisClient.hset(endpoint, REDIS_TAG_PARAMETERS, serializedParams);
 
 			logger.info("Service registered: " + endpoint + ", Port " + taskQueuePort);
@@ -85,25 +85,31 @@ public class Worker {
 		// Socket to send messages to monitor
 		this.monitor = context.socket(ZMQ.PUSH);
 		this.monitor.connect("tcp://" + monitorIp + ":" + monitorPort.toString());
-		
 	}
 
-	public void listen() throws IOException {
-		System.out.println("Java Worker: listening...");
+	public void listen() {
 
 		while (!Thread.currentThread().isInterrupted()) {
+			logger.info("Worker ID: " + this.id + " - Listener loop start! => ");
+			
 			// Get input data as raw String
 			final String dataString = new String(queue.recv(0)).trim();
 
 			// Use Jackson Object Mapper to create pojo from JSON string
 			final ObjectMapper mapper = new ObjectMapper();
-			final InputData inputData = mapper.readValue(dataString, InputData.class);
+			InputData inputData;
+			try {
+				inputData = mapper.readValue(dataString, InputData.class);
+				// Create status message JSON
+				final JobStatus status = new JobStatus(inputData.job_id, id, "running");
+				monitor.send(mapper.writeValueAsString(status));
 			
-			// Create status message JSON
-			final JobStatus status = new JobStatus(inputData.job_id, id, "running");
-			monitor.send(mapper.writeValueAsString(status));
+				logger.info("Data location => " + inputData.data);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
-			logger.info("Data location => " + inputData.data);
 		}
 
 		collector.close();
