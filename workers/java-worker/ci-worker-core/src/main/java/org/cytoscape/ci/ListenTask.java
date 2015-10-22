@@ -6,9 +6,9 @@ public class ListenTask implements Runnable {
 
 	private static final Logger logger = Logger.getLogger("listener");
 
-	private final Worker worker;
+	private final BaseWorker worker;
 
-	public ListenTask(final Worker worker) {
+	public ListenTask(final BaseWorker worker) {
 		this.worker = worker;
 	}
 

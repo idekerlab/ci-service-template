@@ -1,12 +1,12 @@
 # Sample worker definition: layout
 
 scalefree:
-  endpoint: scale-free
-  description: Sample Java worker for generating random graph
+  endpoint: hello-java
+  description: Sample Java worker to display greeting message
   instances: 3
   servers:
     task_queue:
-      location: router
+      location: service
       port: 5560
     collector:
       location: collector

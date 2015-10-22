@@ -88,17 +88,26 @@ class ServiceResource(Resource):
         }
 
         logging.debug('Task JSON = ' + str(task))
+
         registered = self.__redis_conn.hgetall('endpoints')
+
+        logging.debug('Endpoints = ' + str(registered))
+
         if service_name not in registered.keys():
             raise ValueError('No such service: ' + service_name)
 
         send_port = registered[service_name]
+
+        logging.debug('target Port = ' + str(send_port))
+
         if service_name not in self.__sockets.keys():
             send_socket = self.__context.socket(zmq.PUSH)
             send_socket.bind('tcp://*:' + str(send_port))
             self.__sockets[service_name] = send_socket
         else:
             send_socket = self.__sockets[service_name]
+
+        logging.debug('Send socket = ' + str(send_socket))
 
         send_socket.send_json(task)
 

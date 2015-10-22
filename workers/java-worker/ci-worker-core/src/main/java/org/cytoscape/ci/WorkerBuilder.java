@@ -37,10 +37,10 @@ public class WorkerBuilder {
 	private static final Integer DEFAULT_REDIS_PORT = 6379;
 	
 
-	public Worker build(final LinkedHashMap<String, ?> params) throws JsonProcessingException {
+	public BaseWorker build(final LinkedHashMap<String, ?> params) throws JsonProcessingException {
 	
 		// Create an empty instance
-		final Worker worker = new Worker();
+		final BaseWorker worker = new BaseWorker();
 		
 		// Set all required parameters
 		Object endpoint = params.get(ENDPOINT);
@@ -79,7 +79,7 @@ public class WorkerBuilder {
 		return worker; 
 	}
 	
-	private final void setServers(final Worker worker, final Map<String, ?> serverParams) throws JsonProcessingException {
+	private final void setServers(final BaseWorker worker, final Map<String, ?> serverParams) throws JsonProcessingException {
 		
 		final Map<String ,?> taskQueue = (Map<String, ?>) serverParams.get(TASK_QUEUE);
 		final String taskQueueIp = taskQueue.get(LOCATION).toString();
@@ -110,7 +110,7 @@ public class WorkerBuilder {
 		
 	}
 	
-	private final ServiceParameter setParameters(final Worker worker, Map<String, ?> param) {
+	private final ServiceParameter setParameters(final BaseWorker worker, Map<String, ?> param) {
 		return new ServiceParameter(param.get(NAME).toString(), param.get(TYPE).toString(), 
 				param.get(DESCRIPTION).toString(), Boolean.parseBoolean(param.get(REQUIRED).toString()));
 	}

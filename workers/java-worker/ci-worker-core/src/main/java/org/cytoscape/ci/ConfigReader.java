@@ -37,7 +37,7 @@ public class ConfigReader {
 		this.builder = new WorkerBuilder();
 	}
 	
-	public Collection<Worker> read(final URL fileLocation) throws JsonParseException, JsonMappingException, IOException {
+	public Collection<BaseWorker> read(final URL fileLocation) throws JsonParseException, JsonMappingException, IOException {
 		
 		final Map<String, ?> config = mapper.readValue(fileLocation, Map.class);
 		
@@ -46,7 +46,7 @@ public class ConfigReader {
 			.collect(Collectors.toList());
 	}
 	
-	private final Collection<Worker> buildWorkers(Object workerConfig) {
+	private final Collection<BaseWorker> buildWorkers(Object workerConfig) {
 		if(workerConfig instanceof LinkedHashMap == false) {
 			throw new IllegalArgumentException("Worker Configuration is not LinkedHashMap.");
 		}
@@ -56,7 +56,7 @@ public class ConfigReader {
 		
 		Integer numInstances = Integer.parseInt(configMap.get(NUM_INSTANCES).toString());
 		
-		final List<Worker> workers = new ArrayList<>();
+		final List<BaseWorker> workers = new ArrayList<>();
 		for(int i=0; i<numInstances; i++) {
 			try {
 				workers.add(builder.build((LinkedHashMap<String, ?>) workerConfig));
@@ -100,7 +100,7 @@ public class ConfigReader {
 			final ConfigReader reader = new ConfigReader();
 		
 			final File f = new File(configFileLocation);
-			final Collection<Worker> workers = reader.read(f.toURI().toURL());
+			final Collection<BaseWorker> workers = reader.read(f.toURI().toURL());
 			
 			final ExecutorService executor = Executors.newWorkStealingPool();
 			

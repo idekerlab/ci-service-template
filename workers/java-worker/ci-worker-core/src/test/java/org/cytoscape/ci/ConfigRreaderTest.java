@@ -29,7 +29,7 @@ public class ConfigRreaderTest {
 	public void testRead() throws Exception {
 		final ConfigReader reader = new ConfigReader();
 		
-		final Collection<Worker> workers = reader.read(getURI("config1.yml").toURL());
+		final Collection<BaseWorker> workers = reader.read(getURI("config1.yml").toURL());
 		int workerCount = workers.size();
 		System.out.println(workerCount);
 		assertEquals(5, workerCount);
