@@ -103,10 +103,20 @@ public class WorkerBuilder {
 				collectorIp, collectorPort,
 				monitorIp, monitorPort);
 		
-		
 		// Data cache and result file servers
 		final Map<String, ?> result = (Map<String, ?>) serverParams.get(RESULT);
+		System.out.println("@@@@ result server:");
+		System.out.println(result);
+		final String resultServerIp = result.get(LOCATION).toString();
+		final Integer reseultServerPort = Integer.parseInt(result.get(PORT).toString());
+		worker.resultServerLocation = "http://" + resultServerIp + ":" + reseultServerPort + "/";
+		
 		final Map<String, ?> dataCache = (Map<String, ?>) serverParams.get(DATA_CACHE);
+		System.out.println("@@@@ data server:");
+		System.out.println(dataCache);
+		final String dataServerIp = dataCache.get(LOCATION).toString();
+		final Integer dataServerPort = Integer.parseInt(dataCache.get(PORT).toString());
+		worker.dataServerLocation = "http://" + dataServerIp + ":" + dataServerPort + "/";
 		
 	}
 	

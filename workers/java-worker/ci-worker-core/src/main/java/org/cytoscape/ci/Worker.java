@@ -10,6 +10,9 @@ public interface Worker {
 	 * @throws Exception
 	 */
 	public String run(final String rawData) throws Exception;
-	
+
+	/**
+	 * Start listening to the messages via ZeroMQ
+	 */
 	public void listen();
 }

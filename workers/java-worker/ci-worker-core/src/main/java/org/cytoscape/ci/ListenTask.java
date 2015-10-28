@@ -14,9 +14,8 @@ public class ListenTask implements Runnable {
 
 	@Override
 	public void run() {
-		logger.info(worker.id + ": Listening...");
+		logger.info("Worker " + worker.id + " is listening...");
 		worker.listen();
-		logger.info(worker.id
-				+ ": !!!!!!!!!!!!! Listener Interrupted !!!!!!!!!!!!!!!!");
+		logger.info(worker.id + ": Listener Interrupted");
 	}
 }
