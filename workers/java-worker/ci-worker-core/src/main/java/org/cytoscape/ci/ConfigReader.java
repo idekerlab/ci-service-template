@@ -28,6 +28,7 @@ public class ConfigReader {
 
 	// Number of instances for this type of worker
 	private static final String NUM_INSTANCES = "instances";
+	private static final String WORKER_TYPE = "worker";
 
 	private final ObjectMapper mapper;
 	private final WorkerBuilder builder;
@@ -54,14 +55,22 @@ public class ConfigReader {
 		@SuppressWarnings("rawtypes")
 		final LinkedHashMap<String, ?> configMap = (LinkedHashMap) workerConfig;
 		
-		Integer numInstances = Integer.parseInt(configMap.get(NUM_INSTANCES).toString());
+		final Integer numInstances = Integer.parseInt(configMap.get(NUM_INSTANCES).toString());
+		final String workerType = configMap.get(WORKER_TYPE).toString();
 		
 		final List<BaseWorker> workers = new ArrayList<>();
 		for(int i=0; i<numInstances; i++) {
 			try {
-				workers.add(builder.build((LinkedHashMap<String, ?>) workerConfig));
+				// Use reflection to create new worker instance.
+				final Class<? extends BaseWorker> workerClass = (Class<? extends BaseWorker>) Class.forName(workerType);
+				final BaseWorker worker = workerClass.newInstance();
+				workers.add(builder.build(worker, (LinkedHashMap<String, ?>) workerConfig));
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
+				throw new RuntimeException("Could not parse config file.", e);
+			} catch (ReflectiveOperationException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could not create worker.", e);
 			}
 		}
 		return workers;

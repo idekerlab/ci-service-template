@@ -20,7 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import redis.clients.jedis.Jedis;
 
-public class BaseWorker implements Worker {
+
+public abstract class BaseWorker implements Worker {
 
 	private static final Logger logger = Logger.getLogger("worker");
 
@@ -45,7 +46,7 @@ public class BaseWorker implements Worker {
 
 	public Collection<ServiceParameter> parameters;
 
-	private final ObjectMapper mapper;
+	protected final ObjectMapper mapper;
 
 	public BaseWorker() {
 		this.id = IdGenerator.getID().toString();
@@ -99,6 +100,7 @@ public class BaseWorker implements Worker {
 		this.monitor.connect("tcp://" + monitorIp + ":" + monitorPort.toString());
 	}
 
+	@Override
 	public void listen() {
 
 		while (!Thread.currentThread().isInterrupted()) {
@@ -183,17 +185,5 @@ public class BaseWorker implements Worker {
 			System.out.println("ERROR!");
 			throw new IOException("Could not POST result to file server: " + connection.getResponseMessage());
 		}
-	}
-
-	@Override
-	public String run(final String rawData) throws Exception {
-		Map dataMap = mapper.readValue(rawData, Map.class);
-
-		dataMap.keySet().stream().forEach(key -> logger.info(key.toString() + ": " + dataMap.get(key).toString()));
-
-		final Map<String, String> result = new HashMap<>();
-		result.put("response_message", "OK");
-
-		return mapper.writeValueAsString(result);
 	}
 }

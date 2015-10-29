@@ -1,8 +1,9 @@
-# Sample worker definition: layout
+# Sample worker definition: HelloWorker
 
-scalefree:
+hello:
   endpoint: hello-java
   description: Sample Java worker to display greeting message
+  worker: org.cytoscape.ci.worker.HelloWorker
   instances: 3
   servers:
     task_queue:
@@ -24,7 +25,7 @@ scalefree:
       location: dataserver
       port: 3000
   parameters:
-    - name: number_of_nodes
-      type: number
-      description: "Number of nodes in the network"
+    - name: message
+      type: string
+      description: Greeting message
       required: true

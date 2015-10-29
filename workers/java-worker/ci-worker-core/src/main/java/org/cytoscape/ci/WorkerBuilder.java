@@ -37,11 +37,8 @@ public class WorkerBuilder {
 	private static final Integer DEFAULT_REDIS_PORT = 6379;
 	
 
-	public BaseWorker build(final LinkedHashMap<String, ?> params) throws JsonProcessingException {
-	
-		// Create an empty instance
-		final BaseWorker worker = new BaseWorker();
-		
+	public BaseWorker build(final BaseWorker worker, final LinkedHashMap<String, ?> params) throws JsonProcessingException {
+
 		// Set all required parameters
 		Object endpoint = params.get(ENDPOINT);
 		if(endpoint == null || endpoint.toString().isEmpty()) {
