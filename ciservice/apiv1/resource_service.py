@@ -107,7 +107,7 @@ class ServiceResource(Resource):
         else:
             send_socket = self.__sockets[service_name]
 
-        logging.debug('Send socket = ' + str(send_socket))
+        logging.debug('Sending data....')
 
         send_socket.send_json(task)
 

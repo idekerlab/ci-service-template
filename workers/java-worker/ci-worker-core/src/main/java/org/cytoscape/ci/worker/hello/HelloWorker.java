@@ -1,9 +1,9 @@
-package org.cytoscape.ci.worker;
+package org.cytoscape.ci.worker.hello;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.cytoscape.ci.BaseWorker;
+import org.cytoscape.ci.worker.BaseWorker;
 
 /**
  * Sample Worker 1: HelloWorker

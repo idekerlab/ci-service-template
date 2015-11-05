@@ -10,5 +10,5 @@ class WorkerBuilder():
 
         config_data = ConfigParser.parse(config_file_name)
 
-        
+
 

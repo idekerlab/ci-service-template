@@ -6,5 +6,7 @@ package org.cytoscape.ci.worker.nbs;
  *
  */
 public class NBSInput {
+	
+	public String inputFile;
 
 }

@@ -1,10 +1,12 @@
-package org.cytoscape.ci;
+package org.cytoscape.ci.worker;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.cytoscape.ci.ServiceParameter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 

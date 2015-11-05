@@ -100,7 +100,16 @@ class BaseWorker(object):
             data_location = data['data']
             logging.info('Data location => ' + str(data_location))
 
-            response = client.get(data_location)
+            try:
+                response = client.get(data_location)
+            except:
+                # Error happened while getting input data
+                result = {
+                    'worker_id': str(self.id),
+                    'job_id': jid,
+                    'result': 'failed!'
+                }
+                self.__sender.send_json(result)
 
             input_data = response.json()
             input_dict = json.loads(input_data)

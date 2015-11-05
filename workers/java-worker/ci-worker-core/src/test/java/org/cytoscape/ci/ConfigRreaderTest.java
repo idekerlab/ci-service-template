@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.cytoscape.ci.config.WorkerConfiguration;
+import org.cytoscape.ci.worker.BaseWorker;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

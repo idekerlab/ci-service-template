@@ -28,7 +28,7 @@ RUN mkdir /worker
 WORKDIR /worker
 COPY . /worker
 
-EXPOSE 5556 5557 5558 5560
+EXPOSE 5556 5557 5558 5560 5561
 
 # Set path to JRE 8
 RUN mvn clean compile assembly:single

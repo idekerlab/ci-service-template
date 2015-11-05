@@ -1,4 +1,4 @@
-package org.cytoscape.ci;
+package org.cytoscape.ci.worker;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,6 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.cytoscape.ci.IdGenerator;
+import org.cytoscape.ci.InputData;
+import org.cytoscape.ci.JobStatus;
+import org.cytoscape.ci.Result;
+import org.cytoscape.ci.ServiceParameter;
 import org.zeromq.ZMQ;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import redis.clients.jedis.Jedis;
 
 
-public abstract class BaseWorker implements Worker {
+public abstract class BaseWorker extends Thread implements Worker {
 
 	private static final Logger logger = Logger.getLogger("worker");
 
@@ -34,7 +39,7 @@ public abstract class BaseWorker implements Worker {
 	private ZMQ.Socket collector;
 	private ZMQ.Socket monitor;
 
-	final String id;
+	public final String id;
 
 	// The following will be set by Jackson Data Mapper
 	public String endpoint;
@@ -101,17 +106,15 @@ public abstract class BaseWorker implements Worker {
 	}
 
 	@Override
-	public void listen() {
+	public void run() {
 
-		while (!Thread.currentThread().isInterrupted()) {
-			logger.info("Worker ID: " + this.id + " is listening...");
+		while (!Thread.currentThread ().isInterrupted ()) {
+			
+			logger.info("\n\n*************** Worker ID: " + this.id + " is listening *****************");
 
 			// Get input data as raw String
 			byte[] val = queue.recv(0);
-			logger.info("Got Data byte: " + val);
-
 			final String dataString = new String(val);
-			logger.info("Got Data: " + dataString);
 
 			// Use Jackson Object Mapper to create pojo from JSON string
 			InputData inputData;
@@ -127,27 +130,27 @@ public abstract class BaseWorker implements Worker {
 
 				logger.info("Got Input Data => " + inputDataString);
 				final String result = run(inputDataString);
-				logger.info("Result => " + result);
-
 				final String resultFileId = postResultToServer(result);
 				final String resultFileURL = resultServerLocation + "data/" + resultFileId;
-				// TODO: send result to file server
+				
 				final Result resultObj = new Result(inputData.job_id, id, resultFileURL);
 				final String resultAsString = mapper.writeValueAsString(resultObj);
 
 				logger.info("------- Sending result to collector => " + resultAsString);
 
 				collector.send(resultAsString);
+				
+				logger.info("########### Task finihsed.  Need to loop again:: " + id);
 
 			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Could not process job.", e);
-			} finally {
-				collector.close();
-				queue.close();
-				context.term();
+				logger.warning("Could not finish a job: " + e.getMessage());
+				continue;
 			}
 		}
+		
+		collector.close();
+		queue.close();
+		context.term();
 	}
 
 	private final String postResultToServer(final String data) throws IOException {

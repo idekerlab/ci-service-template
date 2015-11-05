@@ -1,10 +1,11 @@
-package org.cytoscape.ci;
+package org.cytoscape.ci.worker;
 
 public interface Worker {
 
 	/**
 	 * 
-	 * Do actual computation/processing and return the result as JSON
+	 * Basic worker interface to perform actual 
+	 * computation and return the result as serialized JSON
 	 * 
 	 * @param rawData input data as a serialized JSON string
 	 * 
@@ -16,5 +17,5 @@ public interface Worker {
 	/**
 	 * Start listening to messages via ZeroMQ
 	 */
-	public void listen();
+//	public void listen();
 }

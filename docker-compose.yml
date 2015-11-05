@@ -30,7 +30,6 @@ service:
   ports:
     - "80:5000" # REST API for users
     - "5556:5556"
-    - "5560:5560"
     - "8888:8888"
     - "9999:9999" # endpoint registration
 
@@ -90,9 +89,9 @@ hello:
     - redis
     - dataserver
     - resultserver
-    - kernelserver
 
-# Sample Java worker
+
+# Sample Java workers
 java:
   build: workers/java-worker/ci-worker-core
   links:
@@ -101,7 +100,6 @@ java:
     - redis
     - dataserver
     - resultserver
-    - kernelserver
 
 # Frontend to test CI
 #notebook:

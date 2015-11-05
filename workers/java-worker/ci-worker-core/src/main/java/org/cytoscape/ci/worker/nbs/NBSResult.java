@@ -6,5 +6,5 @@ package org.cytoscape.ci.worker.nbs;
  *
  */
 public class NBSResult {
-
+	public String result;
 }
