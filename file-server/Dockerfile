@@ -1,6 +1,6 @@
 # Simple file storage using node.js
 
-FROM node:latest
+FROM node:4.2.2
 
 MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 

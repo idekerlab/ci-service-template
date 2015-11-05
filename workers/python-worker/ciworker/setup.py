@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ciworker',
-    version='0.1.4',
+    version='0.2.0',
     description='Cytoscape CI ciworker service template',
     long_description='Template worker code for Cytoscape CI.',
     author='Keiichiro Ono',
@@ -15,7 +15,8 @@ setup(
     install_requires=[
         'requests',
         'pyzmq',
-        'redis'
+        'redis',
+        'pyaml'
     ],
     classifiers=[
         'Intended Audience :: Science/Research',
@@ -23,11 +24,12 @@ setup(
         'Operating System :: OS Independent',
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
         'License :: OSI Approved :: MIT License',
         'Topic :: Scientific/Engineering :: Information Analysis',
         'Topic :: Scientific/Engineering :: Mathematics',
     ],
-    test_suite='tests',
+    test_suite='test',
     packages=find_packages(),
     include_package_data=True,
 )

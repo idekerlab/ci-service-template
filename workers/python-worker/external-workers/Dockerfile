@@ -10,7 +10,7 @@ MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 RUN apt-get update && apt-get install -y \
 		build-essential pkg-config libxml2-dev
 RUN conda update conda && conda install scipy numpy networkx
-RUN pip install hdsubnetfinder python-igraph pyzmq requests
+RUN pip install hdsubnetfinder python-igraph pyzmq requests pyaml
 
 RUN mkdir /workers
 WORKDIR /workers

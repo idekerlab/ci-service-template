@@ -1,0 +1,31 @@
+# Sample worker definition for Python worker
+
+hello:
+  endpoint: hello-python
+  description: Sample Python worker to display greeting message
+  worker: hello_worker.py
+  instances: 3
+  servers:
+    task_queue:
+      location: service
+      port: 5559
+    collector:
+      location: collector
+      port: 5558
+    monitor:
+      location: collector
+      port: 6666
+    redis:
+      location: redis
+      port: 6379
+    result:
+      location: resultserver
+      port: 3000
+    datacache:
+      location: dataserver
+      port: 3000
+  parameters:
+    - name: message
+      type: string
+      description: Greeting message
+      required: true
