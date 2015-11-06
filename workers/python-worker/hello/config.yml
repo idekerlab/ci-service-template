@@ -57,3 +57,33 @@ hello-ndex:
       type: string
       description: Unique network ID in NDEx
       required: true
+
+shell-example:
+  endpoint: shell
+  description: Shell script worker example
+  worker: shell_worker.ShellWorker
+  instances: 2
+  servers:
+    task_queue:
+      location: service
+      port: 5548
+    collector:
+      location: collector
+      port: 5558
+    monitor:
+      location: collector
+      port: 6666
+    redis:
+      location: redis
+      port: 6379
+    result:
+      location: resultserver
+      port: 3000
+    datacache:
+      location: dataserver
+      port: 3000
+  parameters:
+    - name: arg
+      type: string
+      description: arg
+      required: true

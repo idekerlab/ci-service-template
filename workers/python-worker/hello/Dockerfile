@@ -4,8 +4,8 @@ FROM python:3.5
 
 MAINTAINER Keiichiro Ono <kono@ucsd.edu>
 
-RUN apt-get update && apt-get install -y build-essential
-RUN pip install redis pyzmq requests pyaml ciworker==0.2.1
+RUN apt-get update && apt-get install -y build-essential curl jq
+RUN pip install csvkit redis pyzmq requests pyaml ciworker==0.2.1
 
 RUN mkdir /workers
 WORKDIR /workers
