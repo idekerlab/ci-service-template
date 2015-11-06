@@ -1,0 +1,59 @@
+hello:
+  endpoint: hello-python
+  description: Sample Python worker to display greeting message
+  worker: hello_worker.HelloWorker
+  instances: 2
+  servers:
+    task_queue:
+      location: service
+      port: 5559
+    collector:
+      location: collector
+      port: 5558
+    monitor:
+      location: collector
+      port: 6666
+    redis:
+      location: redis
+      port: 6379
+    result:
+      location: resultserver
+      port: 3000
+    datacache:
+      location: dataserver
+      port: 3000
+  parameters:
+    - name: message
+      type: string
+      description: Any string message to be returned.
+      required: true
+
+hello-ndex:
+  endpoint: ndex
+  description: Sample Python worker to process network from NDEx
+  worker: hello_ndex_worker.HelloNdexWorker
+  instances: 2
+  servers:
+    task_queue:
+      location: service
+      port: 5549
+    collector:
+      location: collector
+      port: 5558
+    monitor:
+      location: collector
+      port: 6666
+    redis:
+      location: redis
+      port: 6379
+    result:
+      location: resultserver
+      port: 3000
+    datacache:
+      location: dataserver
+      port: 3000
+  parameters:
+    - name: network_id
+      type: string
+      description: Unique network ID in NDEx
+      required: true

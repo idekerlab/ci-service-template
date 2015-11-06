@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ciworker',
-    version='0.2.0',
+    version='0.2.2',
     description='Cytoscape CI ciworker service template',
     long_description='Template worker code for Cytoscape CI.',
     author='Keiichiro Ono',

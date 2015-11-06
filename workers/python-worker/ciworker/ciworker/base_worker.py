@@ -4,12 +4,6 @@ import json
 import redis
 import requests as client
 
-SEND_PORT = 5558
-MONITOR_PORT = 6666
-
-RESULT_SERVER_LOCATION = 'http://resultserver:3000/'
-REDIS_SERVER_LOCATION = 'redis'
-
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -18,53 +12,70 @@ class BaseWorker(object):
     Minimal worker implementation for python
     """
 
-    def __init__(self,
-                 endpoint,
-                 description,
-                 parameters,
-                 id,
-                 router,
-                 collector,
-                 receiver,
-                 sender=SEND_PORT,
-                 monitor=MONITOR_PORT,
-                 result_server=RESULT_SERVER_LOCATION,
-                 redis_server=REDIS_SERVER_LOCATION):
-
-        self.redis_conn = redis.Redis(redis_server, 6379)
+    def __init__(self, config, id):
 
         self.id = id
-        self.router = router
-        self.result_file_server = result_server
-        
+        endpoint = config['endpoint']
+        description = config['description']
+
+        # Setup servers
+        servers = config['servers']
+
+        config_redis = servers['redis']
+        self.redis_conn = redis.Redis(
+                config_redis['location'], config_redis['port'])
+
+        config_task_queue = servers['task_queue']
+        router = config_task_queue['location']
+        router_port = config_task_queue['port']
+
+        config_collector = servers['collector']
+        collector = config_collector['location']
+        collector_port = config_collector['port']
+
+        config_monitor = servers['monitor']
+        monitor = config_monitor['location']
+        monitor_port = config_monitor['port']
+
+        config_result = servers['result']
+        result_file_server = config_result['location']
+        result_file_server_port = config_result['port']
+
+        self.result_server = 'http://' + result_file_server + ':' \
+                             + str(result_file_server_port) + '/'
+
+        # API Parameters
+        parameters = config['parameters']
+
         # 0MQ context
         context = zmq.Context()
 
         registered = self.redis_conn.hgetall('endpoints')
         if endpoint not in registered.keys():
-            self.redis_conn.hset('endpoints', endpoint, receiver)
+            logging.debug('!!!!!!!!!!!! register: ' + str(endpoint))
+
+            self.redis_conn.hset('endpoints', endpoint, router_port)
             self.redis_conn.hset(endpoint, 'description', str(description))
 
             serialized_params = json.dumps(parameters)
             self.redis_conn.hset(endpoint, 'parameters', serialized_params)
 
-            logging.info('Service registered: ' + endpoint + ', Port ' + str(receiver))
+            logging.info('Service registered: ' + endpoint + ', Port '
+                         + str(router_port))
         else:
             logging.debug('No need to register: ' + str(endpoint))
 
-        # reg.send_json(endpoint)
-
         # For getting input data for this worker
         self.__receiver = context.socket(zmq.PULL)
-        self.__receiver.connect('tcp://' + router + ':' + str(receiver))
+        self.__receiver.connect('tcp://' + router + ':' + str(router_port))
 
         # For sending out the result to collector
         self.__sender = context.socket(zmq.PUSH)
-        self.__sender.connect('tcp://' + collector + ':' + str(sender))
+        self.__sender.connect('tcp://' + collector + ':' + str(collector_port))
 
         # for status monitoring
         self.__monitor = context.socket(zmq.PUSH)
-        self.__monitor.connect('tcp://collector:' + str(monitor))
+        self.__monitor.connect('tcp://' + monitor + ':' + str(monitor_port))
 
     def __create_status(self, job_id):
         status = {
@@ -76,7 +87,7 @@ class BaseWorker(object):
 
     def listen(self):
         # Start listening...
-        logging.info('Worker: ID = ' + str(self.id) + ', Location = ' + str(self.router))
+        logging.info('Python Worker: ID = ' + str(self.id))
 
         while True:
             data = self.__receiver.recv_json()
@@ -116,7 +127,7 @@ class BaseWorker(object):
 
             final_result = self.run(data=input_dict)
 
-            req = client.post(self.result_file_server + 'data', json=final_result, stream=True)
+            req = client.post(self.result_server + 'data', json=final_result, stream=True)
             file_id = req.json()['fileId']
 
             logging.debug('# Result saved to server = ' + str(req.json()))
@@ -124,7 +135,7 @@ class BaseWorker(object):
             result = {
                 'worker_id': str(self.id),
                 'job_id': jid,
-                'result': self.result_file_server + 'data/' + str(file_id)
+                'result': self.result_server + 'data/' + str(file_id)
             }
 
             # Send results to sink
