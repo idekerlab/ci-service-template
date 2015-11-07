@@ -125,9 +125,12 @@ class BaseWorker(object):
             input_data = response.json()
             input_dict = json.loads(input_data)
 
+            # Run the service code.  This is the actual function of this
+            # service.
             final_result = self.run(data=input_dict)
 
-            req = client.post(self.result_server + 'data', json=final_result, stream=True)
+            req = client.post(self.result_server + 'data', data=final_result,
+                              stream=True)
             file_id = req.json()['fileId']
 
             logging.debug('# Result saved to server = ' + str(req.json()))
