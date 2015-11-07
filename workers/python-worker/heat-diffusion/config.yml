@@ -1,0 +1,67 @@
+kernel:
+  endpoint: kernel
+  description: Kernel generator service
+  worker: kernel_generator.KernelGeneratorWorker
+  instances: 2
+  servers:
+    task_queue:
+      location: service
+      port: 5556
+    collector:
+      location: collector
+      port: 5558
+    monitor:
+      location: collector
+      port: 6666
+    redis:
+      location: redis
+      port: 6379
+    result:
+      location: resultserver
+      port: 3000
+    datacache:
+      location: dataserver
+      port: 3000
+  parameters:
+    - name: network_url
+      type: string
+      required: true
+      description: URL of the source SIF network file
+
+subnet:
+  endpoint: subnet
+  description: Heat diffusion sub network finder service
+  worker: subnetwork_finder.SubnetworkFinderWorker
+  instances: 2
+  servers:
+    task_queue:
+      location: service
+      port: 5557
+    collector:
+      location: collector
+      port: 5558
+    monitor:
+      location: collector
+      port: 6666
+    redis:
+      location: redis
+      port: 6379
+    result:
+      location: resultserver
+      port: 3000
+    datacache:
+      location: dataserver
+      port: 3000
+  parameters:
+    - name: network_url
+      type: string
+      required: true
+      description: URL of the SIF network file for the kernel
+    - name: kernel_url
+      type: string
+      required: true
+      description: URL of the pre-computed kernel file
+    - name: query
+      type: array
+      required: true
+      description: Array of gene names to be used for sub network search

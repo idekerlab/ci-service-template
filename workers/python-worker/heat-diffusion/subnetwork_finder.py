@@ -1,6 +1,5 @@
 import logging
 
-from ciworker import arg_parser as parser
 from ciworker.base_worker import BaseWorker
 from hdsubnetfinder.subnetwork.sub_network_finder import SubNetworkFinder
 from hdsubnetfinder.kernel.kernel_generator import KernelGenerator
@@ -8,33 +7,11 @@ import hdsubnetfinder.subnetwork.network_util as util
 
 
 class SubnetworkFinderWorker(BaseWorker):
-    def __init__(self, endpoint, id, router, collector,
-                 receiver):
-        description = 'Heat diffusion sub network finder service.'
-        parameters = {
-            "network_url": {
-                "type": "string",
-                "required": True,
-                "description": "URL of the SIF network file for the kernel."
-            },
-            "kernel_url": {
-                "type": "string",
-                "required": True,
-                "description": "URL of the pre-computed kernel file."
-            },
-            "query": {
-                "type": "array",
-                "required": True,
-                "description": "Array of gene names to be used for "
-                               "sub network search."
-            }
-        }
-        super(SubnetworkFinderWorker, self).__init__(endpoint, description,
-                                                     parameters, id, router,
-                                                     collector, receiver)
-        self.__finders = {}
+
+    __finders = {}
 
     def run(self, data):
+
         logging.debug('Worker ID: ' + str(self.id) + ' Building finder '
                                                      '=========')
         logging.debug(data)
@@ -63,16 +40,3 @@ class SubnetworkFinderWorker(BaseWorker):
             subnetwork)))
 
         return subnetwork
-
-
-if __name__ == '__main__':
-    args = parser.get_args()
-
-    worker = SubnetworkFinderWorker(
-        endpoint=args.endpoint,
-        id=args.id,
-        router=args.router,
-        collector=args.collector,
-        receiver=args.port)
-
-    worker.listen()

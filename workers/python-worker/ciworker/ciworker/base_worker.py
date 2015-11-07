@@ -52,7 +52,6 @@ class BaseWorker(object):
 
         registered = self.redis_conn.hgetall('endpoints')
         if endpoint not in registered.keys():
-            logging.debug('!!!!!!!!!!!! register: ' + str(endpoint))
 
             self.redis_conn.hset('endpoints', endpoint, router_port)
             self.redis_conn.hset(endpoint, 'description', str(description))
@@ -129,7 +128,7 @@ class BaseWorker(object):
             # service.
             final_result = self.run(data=input_dict)
 
-            req = client.post(self.result_server + 'data', data=final_result,
+            req = client.post(self.result_server + 'data', json=final_result,
                               stream=True)
             file_id = req.json()['fileId']
 

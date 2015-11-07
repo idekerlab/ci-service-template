@@ -2,7 +2,6 @@
 import logging
 import uuid
 import requests as client
-from ciworker import arg_parser as parser
 from ciworker.base_worker import BaseWorker
 
 from hdsubnetfinder.kernel.kernel_generator import KernelGenerator
@@ -12,21 +11,6 @@ KERNEL_FILE_SERVER = 'http://kernelserver:3000/'
 
 
 class KernelGeneratorWorker(BaseWorker):
-
-    def __init__(self, endpoint, id, router, collector,
-                 receiver):
-        description = 'Kernel generator service.'
-        parameters = {
-            "network_url": {
-                "type": "string",
-                "required": True,
-                "description": "URL of the source SIF network file."
-            }
-        }
-
-        super(KernelGeneratorWorker, self).__init__(endpoint, description,
-                                                    parameters, id, router,
-                                                    collector, receiver)
 
     def run(self, data):
         # Parse input data
@@ -47,23 +31,13 @@ class KernelGeneratorWorker(BaseWorker):
         self.redis_conn.hset('kernel2network', kernel_id, sif_url)
 
         logging.debug('Kernel File Server response Data = ' + str(req.json()))
+
         result = {
             'kernel_id': kernel_id,
             'network': sif_url,
             'kernel_file': kernel_file_url
         }
 
+        logging.debug(result)
+
         return result
-
-
-if __name__ == '__main__':
-    args = parser.get_args()
-
-    worker = KernelGeneratorWorker(
-        endpoint=args.endpoint,
-        id=args.id,
-        router=args.router,
-        collector=args.collector,
-        receiver=args.port)
-
-    worker.listen()

@@ -81,25 +81,25 @@ heatdiff:
     - resultserver
     - kernelserver
 
-hello:
-  build: workers/python-worker/hello
-  links:
-    - service
-    - collector
-    - redis
-    - dataserver
-    - resultserver
+#hello:
+#  build: workers/python-worker/hello
+#  links:
+#    - service
+#    - collector
+#    - redis
+#    - dataserver
+#    - resultserver
 
 
 # Sample Java workers
-java:
-  build: workers/java-worker/ci-worker-core
-  links:
-    - service
-    - collector
-    - redis
-    - dataserver
-    - resultserver
+#java:
+#  build: workers/java-worker/ci-worker-core
+#  links:
+#    - service
+#    - collector
+#    - redis
+#    - dataserver
+#    - resultserver
 
 # Frontend to test CI
 #notebook:
