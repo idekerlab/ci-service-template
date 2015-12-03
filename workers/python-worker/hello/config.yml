@@ -62,7 +62,7 @@ shell-example:
   endpoint: shell
   description: Shell script worker example
   worker: shell_worker.ShellWorker
-  instances: 2
+  instances: 1
   servers:
     task_queue:
       location: service
@@ -87,3 +87,41 @@ shell-example:
       type: string
       description: arg
       required: true
+
+idmapping:
+  endpoint: idmapping
+  description: Sample Python worker to convert ID using Uniprot Mapper
+  worker: idmapping_worker.IdMappingWorker
+  instances: 2
+  servers:
+    task_queue:
+      location: service
+      port: 5547
+    collector:
+      location: collector
+      port: 5558
+    monitor:
+      location: collector
+      port: 6666
+    redis:
+      location: redis
+      port: 6379
+    result:
+      location: resultserver
+      port: 3000
+    datacache:
+      location: dataserver
+      port: 3000
+  parameters:
+    - name: ids
+      type: array
+      description: IDs to be converted
+      required: true
+    - name: from
+      type: string
+      required: true
+      description: Original ID type (e.g., P_ENTREZGENEID)
+    - name: to
+      type: string
+      required: true
+      description: Target ID type (e.g., GENENAME)

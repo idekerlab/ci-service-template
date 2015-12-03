@@ -148,3 +148,6 @@ class BaseWorker(object):
 
     def post_process(self, result, result_location):
         pass
+
+    def add(self, x, y):
+        return x+y
