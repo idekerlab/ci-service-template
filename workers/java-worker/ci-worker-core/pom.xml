@@ -4,7 +4,7 @@
 
 	<properties>
 		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
-		<junit.version>4.12</junit.version>
+		<junit.version>4.13.1</junit.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<ci.version>1</ci.version>
